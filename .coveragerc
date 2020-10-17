@@ -1,8 +1,8 @@
 [run]
 branch = True
 data_file = .coverage
-source = pystratum_mysql
-omit = pystratum_test/*
+source = pystratum_common
+omit = test/*
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -28,4 +28,4 @@ ignore_errors = True
 output = coverage.xml
 
 [html]
-directory = pystratum_test/html/
+directory = test/html/

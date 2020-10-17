@@ -9,14 +9,14 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='PyStratum-MySQL',
+    name='PyStratum-Common',
 
-    version='0.10.17',
+    version='0.0.0',
 
-    description='A stored procedure and function loader and wrapper generator for MySQL & MariaDB',
+    description='PyStratum Common: Common parts shared between backends for database systems',
     long_description=long_description,
 
-    url='https://github.com/SetBased/py-stratum-mysql',
+    url='https://github.com/DatabaseStratum/py-stratum-common',
 
     author='Set Based IT Consultancy',
     author_email='info@setbased.nl',
@@ -34,14 +34,11 @@ setup(
         'License :: OSI Approved :: MIT License',
 
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
 
-    keywords='stored routines, wrapper, loader, MySQL, MariaDB',
+    keywords='PyStratum',
 
-    packages=find_packages(exclude=['build', 'test']),
-
-    install_requires=['pystratum>=0.10.22'],
+    packages=find_packages(exclude=['build', 'test'])
 )

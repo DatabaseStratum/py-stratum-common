@@ -1,45 +1,22 @@
 filter:
   excluded_paths:
-    - pystratum_test/*
+    - test/*
 
 before_commands:
-  - sudo pip3 install cleo
-  - sudo pip3 install coverage
-  - sudo pip3 install pystratum
-  - sudo wget https://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.5.tar.gz
-  - sudo tar zxvf mysql-connector-python-2.1.5.tar.gz
-  - cd mysql-connector-python-2.1.5 && sudo python3 setup.py install && cd ..
 
 build:
   dependencies:
     before:
-      - pip3 install cleo
+      - pip3 install cleo==0.6.8
       - pip3 install coverage
-      - pip3 install pystratum
-
-      - wget https://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.5.tar.gz
-      - tar zxvf mysql-connector-python-2.1.5.tar.gz
-      - cd mysql-connector-python-2.1.5 && python3 setup.py install
-
-  tests:
-    before:
-      - mysql -u root -e "create database if not exists test;"
-      - mysql -u root -e "create user 'test'@'localhost' identified by 'test';"
-      - mysql -u root -e "grant all on test.*  to 'test'@'localhost';"
-      - mysql -u root -e "set global binlog_format = 'row';"
-      - mysql -u root -e "set global log_bin_trust_function_creators = 1;"
-      - cat pystratum_test/ddl/create_tables.sql | mysql -utest -ptest test
-
-    override:
-      - command: coverage run -m unittest discover -s pystratum_test -p *Test.py
-        coverage:
-          file: '.coverage'
-          config_file: '.coveragerc'
-          format: 'py-cc'
 
   nodes:
     analysis:
       tests:
         override:
+          - command: coverage run -m unittest discover -s test -p *Test.py
+            coverage:
+              file: '.coverage'
+              config_file: '.coveragerc'
+              format: 'py-cc'
           - py-scrutinizer-run
-

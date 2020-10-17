@@ -1,7 +1,6 @@
-<project name="PyStratum-MySQL" default="build" basedir=".">
+<project name="PyStratum" default="build" basedir=".">
     <taskdef name="readSemanticVersion" classname="vendor.setbased.phing-extensions.src.Task.ReadSemanticVersionTask"/>
     <property name="BUILD_DIR" value="./build"/>
-    <property name="VERSION" value="0.0.0"/>
 
     <!-- Run composer update and executes various other updates -->
     <target name="composer-update">
@@ -14,7 +13,6 @@
         <readSemanticVersion file=".version"
                              versionProperty="VERSION"
                              haltOnError="true"/>
-
         <reflexive>
             <fileset dir=".">
                 <include name="setup.py"/>
@@ -39,29 +37,31 @@
     <!-- Uploads a distribution to PyPI -->
     <target name="upload">
         <loadfile property="VERSION" file=".version"/>
-        <exec command="twine upload dist/PyStratum-MySQL-${VERSION}.tar.gz" passthru="true" checkreturn="true"/>
+        <exec command="twine upload dist/PyStratum-Common-${VERSION}.tar.gz" passthru="true" checkreturn="true"/>
     </target>
 
     <!-- All steps for releasing a new version -->
-    <target name="new-version" depends="version,dist,upload,docs"/>
+    <target name="new-version" depends="version,dist,upload"/>
 
-    <!-- Checks the code with pylint -->
-    <target name="pylint">
-        <exec command="pylint --rcfile pylintrc pystratum" passthru="true"/>
-    </target>
-
-    <!-- Runs all unit tests for MySQL-->
+    <!-- Runs all unit tests-->
     <target name="unit">
-        <delete file="pystratum_test/etc/routines.json" quiet="true"/>
-        <exec command="cat pystratum_test/ddl/create_tables.sql | mysql -utest -ptest test" passthru="true" checkreturn="true"/>
-        <exec command="coverage3 run -m unittest discover -s pystratum_test -p \*Test.py" passthru="true" checkreturn="true"/>
-        <exec command="coverage3 html" passthru="true" checkreturn="true"/>
+        <exec command="python3 -m unittest discover -s test -p \*Test.py" passthru="true" checkreturn="true"/>
     </target>
 
-    <!-- Generates the documentation -->
-    <target name="docs">
-        <exec command="sphinx-apidoc -o api --force --doc-project API --no-toc ../pystratum_mysql" dir="docs" passthru="true" checkreturn="true"/>
-        <exec command="make html" dir="docs" passthru="true" checkreturn="true"/>
+    <!-- Generates the API documentation -->
+    <target name="apidoc">
+        <delete includeemptydirs="true" verbose="false" failonerror="true">
+            <fileset dir="source">
+                <include name="**"/>
+                <exclude name="conf.py"/>
+                <exclude name="index.rst"/>
+                <exclude name="Makefile"/>
+                <exclude name="modules.rst"/>
+                <exclude name="_static"/>
+            </fileset>
+        </delete>
+        <exec command="sphinx-apidoc-3 -f pystratum/ -d 4 -e -P -o source/" passthru="true" checkreturn="true"/>
+        <exec command="sphinx-build-3 -b html -d build/doctrees source build/html" passthru="true" checkreturn="true"/>
     </target>
 
     <!-- Default target -->
