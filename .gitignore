@@ -1,9 +1,8 @@
 **/__pycache__/
 /.coverage
 /.idea/
-/PyStratum.egg-info/
+/PyStratum_Common.egg-info/
 /bin/phing
-/build/
 /composer.lock
 /dist/
 /test/html/
