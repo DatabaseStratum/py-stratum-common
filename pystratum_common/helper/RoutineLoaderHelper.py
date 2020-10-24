@@ -6,6 +6,7 @@ import stat
 from typing import Dict, List, Optional, Tuple, Union
 
 from pystratum_backend.StratumStyle import StratumStyle
+
 from pystratum_common.DocBlockReflection import DocBlockReflection
 from pystratum_common.exception.LoaderException import LoaderException
 from pystratum_common.helper.DataTypeHelper import DataTypeHelper
@@ -172,26 +173,17 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
             load = self._must_reload()
             if load:
                 self.__read_source_file()
-
                 self.__get_placeholders()
-
                 self._get_designation_type()
-
                 self._get_name()
-
                 self.__substitute_replace_pairs()
-
                 self._load_routine_file()
-
                 if self._designation_type == 'bulk_insert':
                     self._get_bulk_insert_table_columns_info()
-
                 self._get_routine_parameters_info()
-
                 self.__get_doc_block_parts_wrapper()
-
                 self.__save_shadow_copy()
-
+                self.__validate_parameter_lists()
                 self._update_metadata()
 
             return self._pystratum_metadata
@@ -199,6 +191,33 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         except Exception as exception:
             self._log_exception(exception)
             return False
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def __validate_parameter_lists(self) -> None:
+        """
+        Validates the parameters found the DocBlock in the source of the stored routine against the parameters from the
+        metadata of MySQL and reports missing and unknown parameters names.
+        """
+        # Make list with names of parameters used in database.
+        database_parameters_names = []
+        for parameter in self._parameters:
+            database_parameters_names.append(parameter['name'])
+
+        # Make list with names of parameters used in dock block of routine.
+        doc_block_parameters_names = []
+        if 'parameters' in self._doc_block_parts_source:
+            for parameter in self._doc_block_parts_source['parameters']:
+                doc_block_parameters_names.append(parameter['name'])
+
+        # Check and show warning if any parameters is missing in doc block.
+        for parameter in database_parameters_names:
+            if parameter not in doc_block_parameters_names:
+                self._io.warning('Parameter {} is missing in doc block'.format(parameter))
+
+        # Check and show warning if find unknown parameters in doc block.
+        for parameter in doc_block_parameters_names:
+            if parameter not in database_parameters_names:
+                self._io.warning('Unknown parameter {} found in doc block'.format(parameter))
 
     # ------------------------------------------------------------------------------------------------------------------
     def __read_source_file(self) -> None:
