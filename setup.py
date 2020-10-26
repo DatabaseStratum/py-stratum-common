@@ -42,5 +42,5 @@ setup(
 
     packages=find_packages(exclude=['build', 'test']),
 
-    install_requires=['PyStratum-Backend~=1.02']
+    install_requires=['PyStratum-Backend<2, >=1.0.2']
 )
