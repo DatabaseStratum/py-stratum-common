@@ -323,6 +323,24 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         """
         Extracts the designation type of the stored routine.
         """
+        self._get_designation_type_old()
+        if not self._designation_type:
+            self._get_designation_type_new()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def _get_designation_type_new(self) -> None:
+        """
+        Extracts the designation type of the stored routine.
+        """
+        if not self._designation_type:
+            raise LoaderException("Unable to find the designation type of the stored routine in file {0}".
+                                  format(self._source_filename))
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def _get_designation_type_old(self) -> None:
+        """
+        Extracts the designation type of the stored routine.
+        """
         positions = self._get_specification_positions()
         if positions[0] != -1 and positions[1] != -1:
             pattern = re.compile(r'^\s*--\s+type\s*:\s*(\w+)\s*(.+)?\s*', re.IGNORECASE)
@@ -345,10 +363,6 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
                     else:
                         if matches[0][1]:
                             raise LoaderException('Expected: -- type: {}'.format(self._designation_type))
-
-        if not self._designation_type:
-            raise LoaderException("Unable to find the designation type of the stored routine in file {0}".
-                                  format(self._source_filename))
 
     # ------------------------------------------------------------------------------------------------------------------
     def _get_specification_positions(self) -> Tuple[int, int]:
@@ -459,7 +473,7 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         """
         Returns a data type helper object appropriate for the RDBMS.
 
-        :rtype: pystratum.helper.DataTypeHelper.DataTypeHelper
+        :rtype: DataTypeHelper
         """
         raise NotImplementedError()
 

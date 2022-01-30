@@ -7,6 +7,13 @@
         <exec command="composer update" checkreturn="true" passthru="true"/>
     </target>
 
+    <target name="venv">
+        <delete dir="venv" quiet="true"/>
+        <exec command="python3 -m venv venv" checkreturn="true" passthru="true"/>
+        <exec command="venv/bin/pip install --upgrade pip" checkreturn="true" passthru="true"/>
+        <exec command="venv/bin/pip install -r requirements.txt" checkreturn="true" passthru="true"/>
+    </target>
+
     <!-- Creates a new version/release. -->
     <!-- @todo replace semantic version with pep-396 -->
     <target name="version">

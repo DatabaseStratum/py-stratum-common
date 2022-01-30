@@ -5,7 +5,7 @@ from pystratum_backend.StratumStyle import StratumStyle
 
 class Util:
     """
-    A helper class with miscellaneous functions that don;t belong somewhere else.
+    An utility class with miscellaneous functions that don't belong somewhere else.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
