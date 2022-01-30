@@ -332,6 +332,40 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         """
         Extracts the designation type of the stored routine.
         """
+        line1, line2 = self.__get_doc_block_lines()
+
+        if line1 is not None and line2 is not None and line1 <= line2:
+            doc_block = self._routine_source_code_lines[line1:line2 - line1 + 1]
+        else:
+            doc_block = list()
+
+        reflection = DocBlockReflection(doc_block)
+
+        designation_type = list()
+        for tag in reflection.get_tags('type'):
+                designation_type.append(tag)
+
+        if len(designation_type) == 1:
+            pattern = re.compile(r'^@type\s*(\w+)\s*(.+)?\s*', re.IGNORECASE)
+            matches = pattern.findall(designation_type[0])
+            if matches:
+                self._designation_type = matches[0][0].lower()
+                tmp = str(matches[0][1])
+                if self._designation_type == 'bulk_insert':
+                    n = re.compile(r'([a-zA-Z0-9_]+)\s+([a-zA-Z0-9_,]+)', re.IGNORECASE)
+                    info = n.findall(tmp)
+                    if not info:
+                        raise LoaderException('Expected: -- type: bulk_insert <table_name> <columns> in file {0}'.
+                                              format(self._source_filename))
+                    self._table_name = info[0][0]
+                    self._columns = str(info[0][1]).split(',')
+
+                elif self._designation_type == 'rows_with_key' or self._designation_type == 'rows_with_index':
+                    self._columns = str(matches[0][1]).split(',')
+                else:
+                    if matches[0][1]:
+                        raise LoaderException('Expected: @type {}'.format(self._designation_type))
+
         if not self._designation_type:
             raise LoaderException("Unable to find the designation type of the stored routine in file {0}".
                                   format(self._source_filename))
