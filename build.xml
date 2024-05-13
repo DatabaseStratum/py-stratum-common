@@ -33,7 +33,7 @@
             </fileset>
             <filterchain>
                 <replaceregexp>
-                    <regexp pattern="version = .*" replace="version= &quot;${VERSION}&quot;"/>
+                    <regexp pattern="version = .*" replace="version = &quot;${VERSION}&quot;"/>
                 </replaceregexp>
             </filterchain>
         </reflexive>
