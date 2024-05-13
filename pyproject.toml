@@ -1,6 +1,6 @@
 [project]
 name = "PyStratum-Common"
-version= "1.1.0"
+version = "2.0.0"
 description = "PyStratum Common: Common parts shared between backends for database systems"
 keywords = ["PyStratum", "Common"]
 readme = "README.rst"
