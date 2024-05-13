@@ -13,7 +13,7 @@ class DocBlockReflection:
         """
         Object constructor.
 
-        :param list[str] comment: The comment as a list of strings.
+        :param comment: The comment as a list of strings.
         """
         self._comment: List[str] = comment
         """
@@ -36,8 +36,6 @@ class DocBlockReflection:
     def get_description(self) -> str:
         """
         Returns the description.
-
-        :rtype: str
         """
         return self._description
 
@@ -47,8 +45,6 @@ class DocBlockReflection:
         Returns a tag.
 
         @param str name: The name of the tag.
-
-        :rtype: str
         """
         for tag in self._tags:
             if tag[0] == name:
@@ -62,8 +58,6 @@ class DocBlockReflection:
         Returns a list of tags.
 
         @param str name: The name of the tag.
-
-        :rtype: list[str]
         """
         tags = list()
         for tag in self._tags:
@@ -87,7 +81,7 @@ class DocBlockReflection:
         """
         Removes leading empty lines from a list of lines.
 
-        :param list[str] lines: The lines.
+        :param lines: The lines.
         """
         tmp = list()
         empty = True
@@ -104,7 +98,7 @@ class DocBlockReflection:
         """
         Removes leading empty lines from a list of lines.
 
-        :param list[str] lines: The lines.
+        :param lines: The lines.
         """
         lines.reverse()
         tmp = DocBlockReflection.__remove_leading_empty_lines(lines)

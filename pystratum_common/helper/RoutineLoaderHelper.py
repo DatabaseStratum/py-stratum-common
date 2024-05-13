@@ -5,7 +5,7 @@ import re
 import stat
 from typing import Dict, List, Optional, Tuple, Union
 
-from pystratum_backend.StratumStyle import StratumStyle
+from pystratum_backend.StratumIO import StratumIO
 
 from pystratum_common.DocBlockReflection import DocBlockReflection
 from pystratum_common.exception.LoaderException import LoaderException
@@ -19,7 +19,7 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
 
     # ------------------------------------------------------------------------------------------------------------------
     def __init__(self,
-                 io: StratumStyle,
+                 io: StratumIO,
                  routine_filename: str,
                  routine_file_encoding: str,
                  pystratum_old_metadata: Dict,
@@ -28,12 +28,12 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         """
         Object constructor.
 
-        :param PyStratumStyle io: The output decorator.
-        :param str routine_filename: The filename of the source of the stored routine.
-        :param str routine_file_encoding: The encoding of the source file.
-        :param dict pystratum_old_metadata: The metadata of the stored routine from PyStratum.
-        :param dict[str,str] replace_pairs: A map from placeholders to their actual values.
-        :param dict rdbms_old_metadata: The old metadata of the stored routine from the RDBMS instance.
+        :param io: The output decorator.
+        :param routine_filename: The filename of the source of the stored routine.
+        :param routine_file_encoding: The encoding of the source file.
+        :param pystratum_old_metadata: The metadata of the stored routine from PyStratum.
+        :param replace_pairs: A map from placeholders to their actual values.
+        :param rdbms_old_metadata: The old metadata of the stored routine from the RDBMS instance.
         """
         self._source_filename: str = routine_filename
         """
@@ -136,7 +136,7 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         The key or index columns (depending on the designation type) of the stored routine.
         """
 
-        self._io: StratumStyle = io
+        self._io: StratumIO = io
         """
         The output decorator.
         """
@@ -151,10 +151,8 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         """
         Loads the stored routine into the instance of MySQL.
 
-        Returns the metadata of the stored routine if the stored routine is loaded successfully. Otherwise returns
+        Returns the metadata of the stored routine if the stored routine is loaded successfully. Otherwise, returns
         False.
-
-        :rtype: dict[str,str]|bool
         """
         try:
             self._routine_name = os.path.splitext(os.path.basename(self._source_filename))[0]
@@ -214,7 +212,7 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
             if parameter not in doc_block_parameters_names:
                 self._io.warning('Parameter {} is missing in doc block'.format(parameter))
 
-        # Check and show warning if find unknown parameters in doc block.
+        # Check and show warning if found unknown parameters in doc block.
         for parameter in doc_block_parameters_names:
             if parameter not in database_parameters_names:
                 self._io.warning('Unknown parameter {} found in doc block'.format(parameter))
@@ -279,9 +277,7 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         """
         Logs an exception.
 
-        :param Exception exception: The exception.
-
-        :rtype: None
+        :param exception: The exception.
         """
         self._io.error(str(exception).strip().split(os.linesep))
 
@@ -289,9 +285,7 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _must_reload(self) -> bool:
         """
-        Returns True if the source file must be load or reloaded. Otherwise returns False.
-
-        :rtype: bool
+        Returns whether the source file must be load or reloaded.
         """
         raise NotImplementedError()
 
@@ -402,8 +396,6 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
     def _get_specification_positions(self) -> Tuple[int, int]:
         """
         Returns a tuple with the start and end line numbers of the stored routine specification.
-
-        :rtype: tuple
         """
         start = -1
         for (i, line) in enumerate(self._routine_source_code_lines):
@@ -421,22 +413,18 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _is_start_of_stored_routine(self, line: str) -> bool:
         """
-        Returns True if a line is the start of the code of the stored routine.
+        Returns whether a line is the start of the code of the stored routine.
 
-        :param str line: The line with source code of the stored routine.
-
-        :rtype: bool
+        :param line: The line with source code of the stored routine.
         """
         raise NotImplementedError()
 
     # ------------------------------------------------------------------------------------------------------------------
     def _is_start_of_stored_routine_body(self, line: str) -> bool:
         """
-        Returns True if a line is the start of the body of the stored routine.
+        Returns whether a line is the start of the body of the stored routine.
 
-        :param str line: The line with source code of the stored routine.
-
-        :rtype: bool
+        :param line: The line with source code of the stored routine.
         """
         raise NotImplementedError()
 
@@ -491,9 +479,7 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         """
         Returns the description by name of the parameter as found in the DocBlock of the stored routine.
 
-        :param str name: The name of the parameter.
-
-        :rtype: str
+        :param name: The name of the parameter.
         """
         for param in self._doc_block_parts_source['parameters']:
             if param['name'] == name:
@@ -506,8 +492,6 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
     def _get_data_type_helper(self) -> DataTypeHelper:
         """
         Returns a data type helper object appropriate for the RDBMS.
-
-        :rtype: DataTypeHelper
         """
         raise NotImplementedError()
 
@@ -537,8 +521,6 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
     def _get_name(self) -> None:
         """
         Extracts the name of the stored routine and the stored routine type (i.e. procedure or function) source.
-
-        :rtype: None
         """
         raise NotImplementedError()
 
@@ -562,7 +544,7 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _get_routine_parameters_info(self) -> None:
         """
-        Retrieves information about the stored routine parameters from the meta data of the RDBMS.
+        Retrieves information about the stored routine parameters from the metadata of the RDBMS.
         """
         raise NotImplementedError()
 
@@ -621,10 +603,10 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
     # ------------------------------------------------------------------------------------------------------------------
     def _print_sql_with_error(self, sql: str, error_line: int) -> None:
         """
-        Writes a SQL statement with an syntax error to the output. The line where the error occurs is highlighted.
+        Writes a SQL statement with a syntax error to the output. The line where the error occurs is highlighted.
 
-        :param str sql: The SQL statement.
-        :param int error_line: The line where the error occurs.
+        :param sql: The SQL statement.
+        :param error_line: The line where the error occurs.
         """
         if os.linesep in sql:
             lines = sql.split(os.linesep)

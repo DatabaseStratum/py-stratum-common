@@ -14,17 +14,13 @@ class BulkWrapper(Wrapper, ABC):
     def _return_type_hint(self) -> str:
         """
         Returns the return type hint of the wrapper method.
-
-        :rtype: str
         """
         return 'int'
 
     # ------------------------------------------------------------------------------------------------------------------
     def _get_docstring_return_type(self) -> str:
         """
-        Returns the return type of the wrapper methods the be used in the docstring.
-
-        :rtype: str
+        Returns the return type of the wrapper methods to be used in the docstring.
         """
         return 'int'
 
@@ -34,9 +30,7 @@ class BulkWrapper(Wrapper, ABC):
         """
         Returns code for the parameters of the wrapper method for the stored routine.
 
-        :param dict[str,*] routine: The routine metadata.
-
-        :rtype: str
+        :param routine: The routine metadata.
         """
         parameters = Wrapper._get_wrapper_args(routine)
 
@@ -47,7 +41,7 @@ class BulkWrapper(Wrapper, ABC):
         """
         Writes the parameters part of the docstring for the wrapper method of a stored routine.
 
-        :param dict routine: The metadata of the stored routine.
+        :param routine: The metadata of the stored routine.
         """
         self._write_line('')
         self._write_line(':param pystratum.BulkHandler.BulkHandler bulk_handler: '

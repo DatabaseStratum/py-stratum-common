@@ -13,7 +13,7 @@ class Wrapper(metaclass=abc.ABCMeta):
         """
         Object constructor.
 
-        :param dict routine: The metadata of the stored routine.
+        :param routine: The metadata of the stored routine.
         :param bool lob_as_string_flag: If 'True' LOBs must be treated as strings/bytes.
         """
         self._page_width: int = 120
@@ -38,7 +38,7 @@ class Wrapper(metaclass=abc.ABCMeta):
 
         self._lob_as_string_flag: bool = lob_as_string_flag == 'True'
         """
-        If True BLOBs and CLOBs must be treated as strings.
+        Whether BLOBs and CLOBs must be treated as strings.
         """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class Wrapper(metaclass=abc.ABCMeta):
         """
         Appends a line of code to the generated code and adjust the indent level of the generated code.
 
-        :param line: The line of code (with out LF) that must be appended.
+        :param line: The line of code (without LF) that must be appended.
         """
         if line is None:
             self._write("\n")
@@ -89,11 +89,9 @@ class Wrapper(metaclass=abc.ABCMeta):
     # ------------------------------------------------------------------------------------------------------------------
     def is_lob_parameter(self, parameters: Dict[str, Any]) -> bool:
         """
-        Returns True of one of the parameters is a BLOB or CLOB. Otherwise, returns False.
+        Returns Whether one of the parameters is a BLOB or CLOB.
 
         :param parameters: The parameters of a stored routine.
-
-        :rtype: bool
         """
         raise NotImplementedError()
 
@@ -102,9 +100,7 @@ class Wrapper(metaclass=abc.ABCMeta):
         """
         Returns a complete wrapper method.
 
-        :param dict[str,*] routine: The routine metadata.
-
-        :rtype: str
+        :param routine: The routine metadata.
         """
         if self._lob_as_string_flag:
             return self._write_routine_method_without_lob(routine)
@@ -119,7 +115,7 @@ class Wrapper(metaclass=abc.ABCMeta):
         """
         Writes the description part of the docstring for the wrapper method of a stored routine.
 
-        :param dict routine: The metadata of the stored routine.
+        :param routine: The metadata of the stored routine.
         """
         if routine['pydoc']['description']:
             self._write_line(routine['pydoc']['description'])
@@ -129,7 +125,7 @@ class Wrapper(metaclass=abc.ABCMeta):
         """
         Writes the parameters part of the docstring for the wrapper method of a stored routine.
 
-        :param dict routine: The metadata of the stored routine.
+        :param routine: The metadata of the stored routine.
         """
         if routine['pydoc']['parameters']:
             self._write_line('')
@@ -163,7 +159,7 @@ class Wrapper(metaclass=abc.ABCMeta):
         """
         Writes the docstring for the wrapper method of a stored routine.
 
-        :param dict routine: The metadata of the stored routine.
+        :param routine: The metadata of the stored routine.
         """
         self._write_line('"""')
 
@@ -177,19 +173,17 @@ class Wrapper(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _get_docstring_return_type(self) -> str:
         """
-        Returns the return type of the wrapper method the be used in the docstring.
-
-        :rtype: str
+        Returns the return type of the wrapper method to be used in the docstring.
         """
+        raise NotImplementedError()
 
     # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
     def _return_type_hint(self) -> str:
         """
         Returns the return type hint of the wrapper method.
-
-        :rtype: str
         """
+        raise NotImplementedError()
 
     # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
@@ -205,7 +199,6 @@ class Wrapper(metaclass=abc.ABCMeta):
 
     # ------------------------------------------------------------------------------------------------------------------
     def _write_routine_method_without_lob(self, routine: Dict[str, Any]) -> str:
-
         self._write_line()
         self._write_separator()
         self._write_line('def {0!s}({1!s}) -> {2!s}:'.format(str(routine['routine_name']),
@@ -222,9 +215,7 @@ class Wrapper(metaclass=abc.ABCMeta):
         """
         Returns code for the parameters of the wrapper method for the stored routine.
 
-        :param dict[str,*] routine: The routine metadata.
-
-        :rtype: str
+        :param routine: The routine metadata.
         """
         ret = 'self'
 

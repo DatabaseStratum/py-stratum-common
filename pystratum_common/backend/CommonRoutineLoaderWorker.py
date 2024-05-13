@@ -5,7 +5,8 @@ import os
 from typing import Dict, List, Optional
 
 from pystratum_backend.RoutineLoaderWorker import RoutineLoaderWorker
-from pystratum_backend.StratumStyle import StratumStyle
+from pystratum_backend.StratumIO import StratumIO
+
 from pystratum_common.ConstantClass import ConstantClass
 from pystratum_common.helper.RoutineLoaderHelper import RoutineLoaderHelper
 
@@ -16,17 +17,15 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __init__(self, io: StratumStyle, config: configparser.ConfigParser):
+    def __init__(self, io: StratumIO, config: configparser.ConfigParser):
         """
         Object constructor.
 
-        :param pystratum.style.PyStratumStyle.PyStratumStyle io: The output decorator.
+        :param io: The output decorator.
         """
         self.error_file_names = set()
         """
         A set with source names that are not loaded into RDBMS instance.
-
-        :type: set
         """
 
         self._pystratum_metadata: Dict = {}
@@ -79,7 +78,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         The name of the directory were copies with pure SQL of the stored routine sources must be stored.
         """
 
-        self._io: StratumStyle = io
+        self._io: StratumIO = io
         """
         The output decorator.
         """
@@ -87,8 +86,6 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         self._config = config
         """
         The configuration object.
-
-        :type: ConfigParser 
         """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -112,7 +109,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         if self.error_file_names:
             self.__log_overview_errors()
 
-        self._io.writeln('')
+        self._io.write_line('')
 
         return 1 if self.error_file_names else 0
 
@@ -144,10 +141,10 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
     # ------------------------------------------------------------------------------------------------------------------
     def _add_replace_pair(self, name: str, value: str, quote: bool):
         """
-        Adds a replace part to the map of replace pairs.
+        Adds a replacement to the map of replacement pairs.
 
-        :param name: The name of the replace pair.
-        :param value: The value of value of the replace pair.
+        :param name: The name of the replacement pair.
+        :param value: The value of the replacement pair.
         """
         key = '@' + name + '@'
         key = key.lower()
@@ -170,7 +167,8 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
     def __load_list(self, file_names: Optional[List[str]]) -> None:
         """
         Loads all stored routines in a list into the RDBMS instance.
-        :param list[str] file_names: The list of files to be loaded.
+
+        :param file_names: The list of files to be loaded.
         """
         self.connect()
         self.find_source_files_from_list(file_names)
@@ -210,9 +208,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         self._source_file_extension = self._config.get('loader', 'extension')
         self._source_file_encoding = self._config.get('loader', 'encoding')
         self.__shadow_directory = self._config.get('loader', 'shadow_directory', fallback=None)
-
         self._pystratum_metadata_filename = self._config.get('wrapper', 'metadata')
-
         self._constants_class_name = self._config.get('constants', 'class')
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -227,8 +223,8 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
                     relative_path = os.path.relpath(os.path.join(dir_path, name))
 
                     if basename in self._source_file_names:
-                        self._io.error("Files '{0}' and '{1}' have the same basename.".
-                                       format(self._source_file_names[basename], relative_path))
+                        self._io.error("Files '{0}' and '{1}' have the same basename.".format(
+                                self._source_file_names[basename], relative_path))
                         self.error_file_names.add(relative_path)
                     else:
                         self._source_file_names[basename] = relative_path
@@ -259,11 +255,9 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         """
         Creates a Routine Loader Helper object.
 
-        :param str routine_name: The name of the routine.
-        :param dict pystratum_old_metadata: The old metadata of the stored routine from PyStratum.
-        :param dict rdbms_old_metadata:  The old metadata of the stored routine from database instance.
-
-        :rtype: RoutineLoaderHelper
+        :param routine_name: The name of the routine.
+        :param pystratum_old_metadata: The old metadata of the stored routine from PyStratum.
+        :param rdbms_old_metadata:  The old metadata of the stored routine from database instance.
         """
         raise NotImplementedError()
 
@@ -272,7 +266,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         """
         Loads all stored routines into the RDBMS instance.
         """
-        self._io.writeln('')
+        self._io.write_line('')
 
         for routine_name in sorted(self._source_file_names):
             if routine_name in self._pystratum_metadata:
@@ -346,7 +340,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         """
         Finds all source files that actually exists from a list of file names.
 
-        :param list[str] file_names: The list of file names.
+        :param file_names: The list of file names.
         """
         for file_name in file_names:
             if os.path.exists(file_name):
@@ -354,8 +348,8 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
                 if routine_name not in self._source_file_names:
                     self._source_file_names[routine_name] = file_name
                 else:
-                    self._io.error("Files '{0}' and '{1}' have the same basename.".
-                                   format(self._source_file_names[routine_name], file_name))
+                    self._io.error("Files '{0}' and '{1}' have the same basename.".format(
+                            self._source_file_names[routine_name], file_name))
                     self.error_file_names.add(file_name)
             else:
                 self._io.error("File not exists: '{0}'".format(file_name))
@@ -364,7 +358,8 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
     # ------------------------------------------------------------------------------------------------------------------
     def __get_constants(self) -> None:
         """
-        Gets the constants from the class that acts like a namespace for constants and adds them to the replace pairs.
+        Gets the constants from the class that acts like a namespace for constants and adds them to the replacement
+        pairs.
         """
         helper = ConstantClass(self._constants_class_name, self._io)
         helper.reload()
@@ -373,7 +368,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         for name, value in constants.items():
             self._add_replace_pair(name, value, True)
 
-        self._io.text('Read {0} constants for substitution from <fso>{1}</fso>'.
-                      format(len(constants), helper.file_name()))
+        self._io.text('Read {0} constants for substitution from <fso>{1}</fso>'.format(len(constants),
+                                                                                       helper.file_name()))
 
 # ----------------------------------------------------------------------------------------------------------------------

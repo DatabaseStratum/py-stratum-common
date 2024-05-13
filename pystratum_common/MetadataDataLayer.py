@@ -1,6 +1,6 @@
 import os
 
-from pystratum_backend.StratumStyle import StratumStyle
+from pystratum_backend.StratumIO import StratumIO
 
 
 class MetadataDataLayer:
@@ -9,14 +9,14 @@ class MetadataDataLayer:
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __init__(self, io: StratumStyle):
+    def __init__(self, io: StratumIO):
         """
         Object constructor.
 
-        :param PyStratumStyle io: The output decorator.
+        :param io: The output decorator.
         """
 
-        self._io: StratumStyle = io
+        self._io: StratumIO = io
         """
         The output decorator.
         """
@@ -26,7 +26,7 @@ class MetadataDataLayer:
         """
         Logs the query on the console.
 
-        :param str query: The query.
+        :param query: The query.
         """
         query = query.strip()
 

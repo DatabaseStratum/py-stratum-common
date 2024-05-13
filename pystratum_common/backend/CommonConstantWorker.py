@@ -3,7 +3,8 @@ import configparser
 from typing import Dict, Optional
 
 from pystratum_backend.ConstantWorker import ConstantWorker
-from pystratum_backend.StratumStyle import StratumStyle
+from pystratum_backend.StratumIO import StratumIO
+
 from pystratum_common.ConstantClass import ConstantClass
 from pystratum_common.Util import Util
 
@@ -15,11 +16,11 @@ class CommonConstantWorker(ConstantWorker):
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __init__(self, io: StratumStyle, config: configparser.ConfigParser):
+    def __init__(self, io: StratumIO, config: configparser.ConfigParser):
         """
         Object constructor.
 
-        :param PyStratumStyle io: The output decorator.
+        :param PyStratumIO io: The output decorator.
         """
         self._constants: Dict[str, int] = {}
         """
@@ -52,7 +53,7 @@ class CommonConstantWorker(ConstantWorker):
         All primary key labels, their widths and constant names.
         """
 
-        self._io: StratumStyle = io
+        self._io: StratumIO = io
         """
         The output decorator.
         """
@@ -104,7 +105,7 @@ class CommonConstantWorker(ConstantWorker):
             self.disconnect()
             self.__log_number_of_constants()
 
-            self._io.writeln('')
+            self._io.write_line('')
         else:
             self._io.log_verbose('Constants not enabled')
 
@@ -118,7 +119,7 @@ class CommonConstantWorker(ConstantWorker):
         n_id = len(self._labels)
         n_widths = len(self._constants) - n_id
 
-        self._io.writeln('')
+        self._io.write_line('')
         self._io.text('Number of constants based on column widths: {0}'.format(n_widths))
         self._io.text('Number of constants based on database IDs : {0}'.format(n_id))
 
@@ -154,8 +155,8 @@ class CommonConstantWorker(ConstantWorker):
     def _enhance_columns(self) -> None:
         """
         Enhances old_columns as follows:
-        If the constant name is *, is is replaced with the column name prefixed by prefix in uppercase.
-        Otherwise the constant name is set to uppercase.
+        If the constant name is *, it is replaced with the column name prefixed by prefix in uppercase.
+        Otherwise, the constant name is set to uppercase.
         """
         raise NotImplementedError()
 
@@ -199,9 +200,7 @@ class CommonConstantWorker(ConstantWorker):
         for constants.
         """
         helper = ConstantClass(self._class_name, self._io)
-
         content = helper.source_with_constants(self._constants)
-
         Util.write_two_phases(helper.file_name(), content, self._io)
 
 # ----------------------------------------------------------------------------------------------------------------------

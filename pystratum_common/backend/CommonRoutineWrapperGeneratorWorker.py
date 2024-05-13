@@ -5,7 +5,7 @@ import os
 from typing import Any, Dict, Optional
 
 from pystratum_backend.RoutineWrapperGeneratorWorker import RoutineWrapperGeneratorWorker
-from pystratum_backend.StratumStyle import StratumStyle
+from pystratum_backend.StratumIO import StratumIO
 from pystratum_common.Util import Util
 
 
@@ -15,11 +15,11 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __init__(self, io: StratumStyle, config: configparser.ConfigParser):
+    def __init__(self, io: StratumIO, config: configparser.ConfigParser):
         """
         Object constructor.
 
-        :param PyStratumStyle io: The output decorator.
+        :param io: The output decorator.
         """
         self._code: str = ''
         """
@@ -56,7 +56,7 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         The filename where the generated wrapper class must be stored.
         """
 
-        self._io: StratumStyle = io
+        self._io: StratumIO = io
         """
         The output decorator.
         """
@@ -64,16 +64,12 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         self._config = config
         """
         The configuration object.
-
-        :type: ConfigParser 
         """
 
     # ------------------------------------------------------------------------------------------------------------------
     def execute(self) -> int:
         """
         The "main" of the wrapper generator. Returns 0 on success, 1 if one or more errors occurred.
-
-        :rtype: int
         """
         self._read_configuration_file()
 
@@ -82,7 +78,7 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
 
             self.__generate_wrapper_class()
 
-            self._io.writeln('')
+            self._io.write_line('')
         else:
             self._io.log_verbose('Wrapper not enabled')
 
@@ -124,8 +120,6 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
     def _read_routine_metadata(self) -> Dict:
         """
         Returns the metadata of stored routines.
-
-        :rtype: dict
         """
         metadata = {}
         if os.path.isfile(self._metadata_filename):
@@ -154,7 +148,7 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         """
         Writes a line with Python code to the generate code buffer.
 
-        :param str text: The line with Python code.
+        :param text: The line with Python code.
         """
         if text:
             self._code += str(text) + "\n"
@@ -176,7 +170,7 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         """
         Generates a complete wrapper method for a stored routine.
 
-        :param dict routine: The metadata of the stored routine.
+        :param routine: The metadata of the stored routine.
         """
         raise NotImplementedError()
 

@@ -3,7 +3,7 @@ import inspect
 import re
 from typing import Any, Dict, List, Union
 
-from pystratum_backend.StratumStyle import StratumStyle
+from pystratum_backend.StratumIO import StratumIO
 
 
 class ConstantClass:
@@ -12,12 +12,12 @@ class ConstantClass:
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __init__(self, class_name: str, io: StratumStyle):
+    def __init__(self, class_name: str, io: StratumIO):
         """
         Object constructor.
 
-        :param str class_name: The name of class that acts like a namespace for constants.
-        :param PyStratumStyle io: The output decorator.
+        :param class_name: The name of class that acts like a namespace for constants.
+        :param io: The output decorator.
         """
         self.__class_name: str = class_name
         """
@@ -36,7 +36,7 @@ class ConstantClass:
         The comment after which the auto generated constants must be inserted.
         """
 
-        self._io: StratumStyle = io
+        self._io: StratumIO = io
         """
         The output decorator.
         """
@@ -62,8 +62,6 @@ class ConstantClass:
     def file_name(self) -> str:
         """
         Returns the filename of the module with the class that acts like a namespace for constants.
-
-        :rtype: str
         """
         return inspect.getfile(self.__module)
 
@@ -71,8 +69,6 @@ class ConstantClass:
     def source(self) -> str:
         """
         Returns the source of the module with the class that acts like a namespace for constants.
-
-        :rtype: str
         """
         return inspect.getsource(self.__module)
 
@@ -87,8 +83,6 @@ class ConstantClass:
     def constants(self) -> Dict[str, Any]:
         """
         Gets the constants from the class that acts like a namespace for constants.
-
-        :rtype: dict<str,*>
         """
         ret = {}
 
@@ -109,9 +103,7 @@ class ConstantClass:
         * Last line with constants
         * Indent for constants
 
-        :param list[str] lines: The source of the module with the class that acts like a namespace for constants.
-
-        :rtype: dict<str,int|str>
+        :param lines: The source of the module with the class that acts like a namespace for constants.
         """
         ret = {'start_line': 0,
                'last_line':  0,
@@ -149,9 +141,7 @@ class ConstantClass:
         """
         Returns the source of the module with the class that acts like a namespace for constants with new constants.
 
-        :param dict[str,int] constants: The new constants.
-
-        :rtype: str
+        :param constants: The new constants.
         """
         old_lines = self.source().split("\n")
         info = self.__extract_info(old_lines)

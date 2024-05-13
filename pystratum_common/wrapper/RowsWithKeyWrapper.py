@@ -6,7 +6,7 @@ from pystratum_common.wrapper.Wrapper import Wrapper
 
 class RowsWithKeyWrapper(Wrapper):
     """
-    Parent class wrapper wrapper method generator for stored procedures whose result set must be returned using tree
+    Parent class wrapper method generator for stored procedures whose result set must be returned using tree
     structure using a combination of unique columns.
     """
 
@@ -14,17 +14,13 @@ class RowsWithKeyWrapper(Wrapper):
     def _return_type_hint(self) -> str:
         """
         Returns the return type hint of the wrapper method.
-
-        :rtype: str
         """
         return 'Dict'
 
     # ------------------------------------------------------------------------------------------------------------------
     def _get_docstring_return_type(self):
         """
-        Returns the return type of the wrapper methods the be used in the docstring.
-
-        :rtype: str
+        Returns the return type of the wrapper methods to be used in the docstring.
         """
         return 'dict'
 
