@@ -1,0 +1,34 @@
+[project]
+name = "PyStratum-Common"
+version= "1.1.0"
+description = "PyStratum Common: Common parts shared between backends for database systems"
+keywords = ["PyStratum", "Common"]
+readme = "README.rst"
+authors = [
+    {name = "Set Based IT Consultancy", email = "info@setbased.nl"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: System :: Installation/Setup",
+]
+dependencies = [
+    "PyStratum-Backend~=2.0.1",
+]
+license = {text = "MIT"}
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "https://github.com/DatabaseStratum/py-stratum-common"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
