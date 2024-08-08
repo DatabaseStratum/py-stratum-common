@@ -7,9 +7,9 @@ from typing import Dict
 from pystratum_backend.RoutineWrapperGeneratorWorker import RoutineWrapperGeneratorWorker
 from pystratum_backend.StratumIO import StratumIO
 
-from pystratum_common.BuildContext import BuildContext
-from pystratum_common.PythonCodeStore import PythonCodeStore
-from pystratum_common.Util import Util
+from pystratum_common.helper.Util import Util
+from pystratum_common.wrapper.helper.PythonCodeStore import PythonCodeStore
+from pystratum_common.wrapper.helper.WrapperContext import BuildContext
 
 
 class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):

@@ -1,16 +1,17 @@
 import abc
 import os
 
-from pystratum_common.BuildContext import BuildContext
+from pystratum_common.wrapper.helper.WrapperContext import BuildContext
 
 
-class Wrapper(metaclass=abc.ABCMeta):
+class CommonWrapper(metaclass=abc.ABCMeta):
     """
     Parent class for classes that generate Python code, i.e. wrappers, for calling a stored procedures and functions.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _build_docstring_description(self, context: BuildContext) -> None:
+    @staticmethod
+    def _build_docstring_description(context: BuildContext) -> None:
         """
         Builds the description part of the docstring for the wrapper method of a stored routine.
 

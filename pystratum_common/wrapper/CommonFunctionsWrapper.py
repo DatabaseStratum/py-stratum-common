@@ -1,12 +1,12 @@
 from abc import ABC
 
-from pystratum_common.BuildContext import BuildContext
-from pystratum_common.wrapper.Wrapper import Wrapper
+from pystratum_common.wrapper.CommonWrapper import CommonWrapper
+from pystratum_common.wrapper.helper.WrapperContext import BuildContext
 
 
-class LogWrapper(Wrapper, ABC):
+class CommonFunctionsWrapper(CommonWrapper, ABC):
     """
-    Wrapper method generator for stored procedures with designation type log.
+    Wrapper method generator for stored functions.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -16,6 +16,8 @@ class LogWrapper(Wrapper, ABC):
 
         :param context: The build context.
         """
-        return 'int'
+        context.code_store.add_import('typing', 'Any')
+
+        return 'Any'
 
 # ----------------------------------------------------------------------------------------------------------------------

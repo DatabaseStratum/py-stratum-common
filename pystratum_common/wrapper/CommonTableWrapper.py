@@ -1,12 +1,12 @@
 from abc import ABC
 
-from pystratum_common.BuildContext import BuildContext
-from pystratum_common.wrapper.Wrapper import Wrapper
+from pystratum_common.wrapper.CommonWrapper import CommonWrapper
+from pystratum_common.wrapper.helper.WrapperContext import BuildContext
 
 
-class NoneWrapper(Wrapper, ABC):
+class CommonTableWrapper(CommonWrapper, ABC):
     """
-    Wrapper method generator for stored procedures without any result set.
+    Wrapper method generator for printing the result set of stored procedures in a table format.
     """
 
     # ------------------------------------------------------------------------------------------------------------------

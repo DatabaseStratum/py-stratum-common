@@ -1,12 +1,12 @@
 from abc import ABC
 
-from pystratum_common.BuildContext import BuildContext
-from pystratum_common.wrapper.Wrapper import Wrapper
+from pystratum_common.wrapper.CommonWrapper import CommonWrapper
+from pystratum_common.wrapper.helper.WrapperContext import BuildContext
 
 
-class TableWrapper(Wrapper, ABC):
+class CommonRow1Wrapper(CommonWrapper, ABC):
     """
-    Wrapper method generator for printing the result set of stored procedures in a table format.
+    Wrapper method generator for stored procedures that are selecting 1 row.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -16,6 +16,9 @@ class TableWrapper(Wrapper, ABC):
 
         :param context: The build context.
         """
-        return 'int'
+        context.code_store.add_import('typing', 'Any')
+        context.code_store.add_import('typing', 'Dict')
+
+        return 'Dict[str, Any]'
 
 # ----------------------------------------------------------------------------------------------------------------------

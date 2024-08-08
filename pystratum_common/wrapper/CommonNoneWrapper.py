@@ -1,12 +1,12 @@
 from abc import ABC
 
-from pystratum_common.BuildContext import BuildContext
-from pystratum_common.wrapper.Wrapper import Wrapper
+from pystratum_common.wrapper.CommonWrapper import CommonWrapper
+from pystratum_common.wrapper.helper.WrapperContext import BuildContext
 
 
-class Singleton0Wrapper(Wrapper, ABC):
+class CommonNoneWrapper(CommonWrapper, ABC):
     """
-    Wrapper method generator for stored procedures that are selecting 0 or 1 row with one column only.
+    Wrapper method generator for stored procedures without any result set.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -16,8 +16,6 @@ class Singleton0Wrapper(Wrapper, ABC):
 
         :param context: The build context.
         """
-        context.code_store.add_import('typing', 'Any')
-
-        return 'Any'
+        return 'int'
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -7,8 +7,8 @@ from typing import Dict, List
 from pystratum_backend.RoutineLoaderWorker import RoutineLoaderWorker
 from pystratum_backend.StratumIO import StratumIO
 
-from pystratum_common.ConstantClass import ConstantClass
-from pystratum_common.helper.RoutineLoaderHelper import RoutineLoaderHelper
+from pystratum_common.constant.ConstantClass import ConstantClass
+from pystratum_common.loader.CommonRoutineLoader import CommonRoutineLoader
 
 
 class CommonRoutineLoaderWorker(RoutineLoaderWorker):
@@ -250,7 +250,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
     def create_routine_loader_helper(self,
                                      routine_name: str,
                                      pystratum_old_metadata: Dict,
-                                     rdbms_old_metadata: Dict) -> RoutineLoaderHelper:
+                                     rdbms_old_metadata: Dict) -> CommonRoutineLoader:
         """
         Creates a Routine Loader Helper object.
 

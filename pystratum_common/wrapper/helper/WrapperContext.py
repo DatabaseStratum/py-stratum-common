@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
-from pystratum_common.PythonCodeStore import PythonCodeStore
+from pystratum_common.wrapper.helper.PythonCodeStore import PythonCodeStore
 
 
 @dataclass

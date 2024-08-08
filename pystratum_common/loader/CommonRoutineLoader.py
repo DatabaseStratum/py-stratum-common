@@ -7,14 +7,14 @@ from typing import Dict, List, Tuple
 
 from pystratum_backend.StratumIO import StratumIO
 
-from pystratum_common.DocBlockReflection import DocBlockReflection
 from pystratum_common.exception.LoaderException import LoaderException
-from pystratum_common.helper.DataTypeHelper import DataTypeHelper
+from pystratum_common.loader.helper.DataTypeHelper import DataTypeHelper
+from pystratum_common.loader.helper.DocBlockReflection import DocBlockReflection
 
 
-class RoutineLoaderHelper(metaclass=abc.ABCMeta):
+class CommonRoutineLoader(metaclass=abc.ABCMeta):
     """
-    Class for loading a single stored routine into a RDBMS instance from a (pseudo) SQL file.
+    Class for loading a single stored routine into a RDBMS instance from a SQL file.
     """
 
     # ------------------------------------------------------------------------------------------------------------------

@@ -1,12 +1,12 @@
 from abc import ABC
 
-from pystratum_common.BuildContext import BuildContext
-from pystratum_common.wrapper.Wrapper import Wrapper
+from pystratum_common.wrapper.CommonWrapper import CommonWrapper
+from pystratum_common.wrapper.helper.WrapperContext import BuildContext
 
 
-class FunctionsWrapper(Wrapper, ABC):
+class CommonRow0Wrapper(CommonWrapper, ABC):
     """
-    Wrapper method generator for stored functions.
+    Wrapper method generator for stored procedures that are selecting 0 or 1 row.
     """
 
     # ------------------------------------------------------------------------------------------------------------------

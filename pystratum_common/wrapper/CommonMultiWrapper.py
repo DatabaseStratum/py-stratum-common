@@ -1,12 +1,12 @@
 from abc import ABC
 
-from pystratum_common.BuildContext import BuildContext
-from pystratum_common.wrapper.Wrapper import Wrapper
+from pystratum_common.wrapper.CommonWrapper import CommonWrapper
+from pystratum_common.wrapper.helper.WrapperContext import BuildContext
 
 
-class Singleton1Wrapper(Wrapper, ABC):
+class CommonMultiWrapper(CommonWrapper, ABC):
     """
-    Wrapper method generator for stored procedures that are selecting 1 row with one column only.
+    Wrapper method generator for stored procedures with designation type log.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -17,7 +17,9 @@ class Singleton1Wrapper(Wrapper, ABC):
         :param context: The build context.
         """
         context.code_store.add_import('typing', 'Any')
+        context.code_store.add_import('typing', 'Dict')
+        context.code_store.add_import('typing', 'List')
 
-        return 'Any'
+        return 'List[List[Dict[str, Any]]]'
 
 # ----------------------------------------------------------------------------------------------------------------------

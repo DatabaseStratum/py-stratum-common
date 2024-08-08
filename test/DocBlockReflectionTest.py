@@ -1,6 +1,6 @@
 import unittest
 
-from pystratum_common.DocBlockReflection import DocBlockReflection
+from pystratum_common.loader.helper.DocBlockReflection import DocBlockReflection
 
 
 class DocBlockReflectionTest(unittest.TestCase):

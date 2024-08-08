@@ -5,8 +5,8 @@ from typing import Dict
 from pystratum_backend.ConstantWorker import ConstantWorker
 from pystratum_backend.StratumIO import StratumIO
 
-from pystratum_common.ConstantClass import ConstantClass
-from pystratum_common.Util import Util
+from pystratum_common.constant.ConstantClass import ConstantClass
+from pystratum_common.helper.Util import Util
 
 
 class CommonConstantWorker(ConstantWorker):

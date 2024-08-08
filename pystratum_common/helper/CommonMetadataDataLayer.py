@@ -3,7 +3,7 @@ import os
 from pystratum_backend.StratumIO import StratumIO
 
 
-class MetadataDataLayer:
+class CommonMetadataDataLayer:
     """
     Data layer for retrieving metadata and loading stored routines.
     """

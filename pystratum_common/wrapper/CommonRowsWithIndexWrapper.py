@@ -1,10 +1,10 @@
 import abc
 
-from pystratum_common.BuildContext import BuildContext
-from pystratum_common.wrapper.Wrapper import Wrapper
+from pystratum_common.wrapper.CommonWrapper import CommonWrapper
+from pystratum_common.wrapper.helper.WrapperContext import BuildContext
 
 
-class RowsWithIndexWrapper(Wrapper):
+class CommonRowsWithIndexWrapper(CommonWrapper):
     """
     Parent class wrapper method generator for stored procedures whose result set  must be returned using tree
     structure using a combination of non-unique columns.

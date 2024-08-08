@@ -1,11 +1,11 @@
 import re
 from abc import ABC
 
-from pystratum_common.BuildContext import BuildContext
-from pystratum_common.wrapper.Wrapper import Wrapper
+from pystratum_common.wrapper.CommonWrapper import CommonWrapper
+from pystratum_common.wrapper.helper.WrapperContext import BuildContext
 
 
-class BulkWrapper(Wrapper, ABC):
+class CommonBulkWrapper(CommonWrapper, ABC):
     """
     Wrapper method generator for stored procedures with designation type bulk.
     """
@@ -28,7 +28,7 @@ class BulkWrapper(Wrapper, ABC):
         :param context: The build context.
         """
         context.code_store.add_import('pystratum_middle.BulkHandler', 'BulkHandler')
-        parameters = Wrapper._wrapper_args(context)
+        parameters = CommonWrapper._wrapper_args(context)
 
         return re.sub(r'^self', 'self, bulk_handler: BulkHandler', parameters)
 
@@ -43,6 +43,6 @@ class BulkWrapper(Wrapper, ABC):
         context.code_store.append_line(':param BulkHandler bulk_handler: '
                                        'The bulk handler for processing the selected rows.')
 
-        Wrapper._build_docstring_parameters(self, context)
+        CommonWrapper._build_docstring_parameters(self, context)
 
 # ----------------------------------------------------------------------------------------------------------------------
