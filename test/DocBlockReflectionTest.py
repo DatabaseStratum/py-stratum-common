@@ -162,4 +162,33 @@ class DocBlockReflectionTest(unittest.TestCase):
         params = reflection.get_tags('param')
         self.assertEqual(['@param p1 This is param1.', '@param p2 This is param2.\nThis is more about param2'], params)
 
+    # ------------------------------------------------------------------------------------------------------------------
+    def testParameterWithDoubleColon(self):
+        """
+        Test parameters with leading double colon.
+        """
+        doc_block = """
+/**
+ * Test for designation type singleton0.
+ *
+ * @param int :p_count The number of rows selected.
+ *
+ * @type   singleton0
+ * @return int|null
+ */
+ """
+        reflection = DocBlockReflection(doc_block.strip().split("\n"))
+
+        description = reflection.get_description()
+        self.assertEqual('Test for designation type singleton0.', description)
+
+        params = reflection.get_tags('param')
+        self.assertEqual(['@param int :p_count The number of rows selected.'], params)
+
+        types = reflection.get_tags('type')
+        self.assertEqual(['@type   singleton0'], types)
+
+        returns = reflection.get_tags('return')
+        self.assertEqual(['@return int|null'], returns)
+
 # ----------------------------------------------------------------------------------------------------------------------
