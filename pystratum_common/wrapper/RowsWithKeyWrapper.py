@@ -1,6 +1,6 @@
 import abc
-from typing import Any, Dict
 
+from pystratum_common.BuildContext import BuildContext
 from pystratum_common.wrapper.Wrapper import Wrapper
 
 
@@ -11,81 +11,86 @@ class RowsWithKeyWrapper(Wrapper):
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _return_type_hint(self) -> str:
+    def _return_type_hint(self, context: BuildContext) -> str:
         """
-        Returns the return type hint of the wrapper method.
+        Returns the return type of the wrapper method.
+
+        :param context: The build context.
         """
+        context.code_store.add_import('typing', 'Dict')
+
         return 'Dict'
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _get_docstring_return_type(self):
-        """
-        Returns the return type of the wrapper methods to be used in the docstring.
-        """
-        return 'dict'
-
-    # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
-    def _write_execute_rows(self, routine: Dict[str, Any]) -> None:
+    def _build_execute_rows(self, context: BuildContext) -> None:
+        """
+        Builds the code for invoking the stored routine.
+
+        :param context: The build context.
+        """
         raise NotImplementedError()
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _write_result_handler(self, routine: Dict[str, Any]) -> None:
+    def _build_result_handler(self, context: BuildContext) -> None:
         """
-        Generates code for calling the stored routine in the wrapper method.
-        """
-        self._write_line('ret = {}')
-        self._write_execute_rows(routine)
-        self._write_line('for row in rows:')
+        Builds the code for calling the stored routine in the wrapper method.
 
-        num_of_dict = len(routine['columns'])
+        :param context: The build context.
+        """
+        context.code_store.append_line('ret = {}')
+        self._build_execute_rows(context)
+        context.code_store.append_line('for row in rows:')
+
+        num_of_dict = len(context.routine['columns'])
 
         i = 0
         while i < num_of_dict:
-            value = "row['{0!s}']".format(routine['columns'][i])
+            value = "row['{0!s}']".format(context.routine['columns'][i])
 
             stack = ''
             j = 0
             while j < i:
-                stack += "[row['{0!s}']]".format(routine['columns'][j])
+                stack += "[row['{0!s}']]".format(context.routine['columns'][j])
                 j += 1
             line = 'if {0!s} in ret{1!s}:'.format(value, stack)
-            self._write_line(line)
+            context.code_store.append_line(line)
             i += 1
 
         line = "raise Exception('Duplicate key for %s.' % str(({0!s})))". \
-            format(", ".join(["row['{0!s}']".format(column_name) for column_name in routine['columns']]))
+            format(", ".join(["row['{0!s}']".format(column_name) for column_name in context.routine['columns']]))
 
-        self._write_line(line)
-        self._indent_level_down()
+        context.code_store.append_line(line)
+        context.code_store.decrement_indent_level()
 
         i = num_of_dict
         while i > 0:
-            self._write_line('else:')
+            context.code_store.append_line('else:')
 
             part1 = ''
             j = 0
             while j < i - 1:
-                part1 += "[row['{0!s}']]".format(routine['columns'][j])
+                part1 += "[row['{0!s}']]".format(context.routine['columns'][j])
                 j += 1
-            part1 += "[row['{0!s}']]".format(routine['columns'][j])
+            part1 += "[row['{0!s}']]".format(context.routine['columns'][j])
 
             part2 = ''
             j = i - 1
             while j < num_of_dict:
                 if j + 1 != i:
-                    part2 += "{{row['{0!s}']: ".format(routine['columns'][j])
+                    part2 += "{{row['{0!s}']: ".format(context.routine['columns'][j])
                 j += 1
             part2 += "row" + ('}' * (num_of_dict - i))
 
             line = "ret{0!s} = {1!s}".format(part1, part2)
-            self._write_line(line)
-            self._indent_level_down()
+            context.code_store.append_line(line)
+            context.code_store.decrement_indent_level()
             if i > 1:
-                self._indent_level_down()
+                context.code_store.decrement_indent_level()
             i -= 1
 
-        self._write_line()
-        self._write_line('return ret')
+        context.code_store.append_line()
+        context.code_store.decrement_indent_level()
+        context.code_store.append_line('return ret')
 
 # ----------------------------------------------------------------------------------------------------------------------

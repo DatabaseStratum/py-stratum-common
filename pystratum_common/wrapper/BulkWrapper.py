@@ -1,7 +1,7 @@
 import re
 from abc import ABC
-from typing import Any, Dict
 
+from pystratum_common.BuildContext import BuildContext
 from pystratum_common.wrapper.Wrapper import Wrapper
 
 
@@ -11,42 +11,38 @@ class BulkWrapper(Wrapper, ABC):
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _return_type_hint(self) -> str:
+    def _return_type_hint(self, context: BuildContext) -> str:
         """
         Returns the return type hint of the wrapper method.
-        """
-        return 'int'
 
-    # ------------------------------------------------------------------------------------------------------------------
-    def _get_docstring_return_type(self) -> str:
-        """
-        Returns the return type of the wrapper methods to be used in the docstring.
+        :param context: The build context.
         """
         return 'int'
 
     # ------------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def _get_wrapper_args(routine: Dict[str, Any]) -> str:
+    def _wrapper_args(context: BuildContext) -> str:
         """
         Returns code for the parameters of the wrapper method for the stored routine.
 
-        :param routine: The routine metadata.
+        :param context: The build context.
         """
-        parameters = Wrapper._get_wrapper_args(routine)
+        context.code_store.add_import('pystratum_middle.BulkHandler', 'BulkHandler')
+        parameters = Wrapper._wrapper_args(context)
 
-        return re.sub(r'^self', 'self, bulk_handler', parameters)
+        return re.sub(r'^self', 'self, bulk_handler: BulkHandler', parameters)
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _write_docstring_parameters(self, routine: Dict[str, Any]) -> None:
+    def _build_docstring_parameters(self, context: BuildContext) -> None:
         """
-        Writes the parameters part of the docstring for the wrapper method of a stored routine.
+        Builds the parameters part of the docstring for the wrapper method of a stored routine.
 
-        :param routine: The metadata of the stored routine.
+        :param context: The build context.
         """
-        self._write_line('')
-        self._write_line(':param pystratum.BulkHandler.BulkHandler bulk_handler: '
-                         'The bulk handler for processing the selected rows.')
+        context.code_store.append_line('')
+        context.code_store.append_line(':param BulkHandler bulk_handler: '
+                                       'The bulk handler for processing the selected rows.')
 
-        Wrapper._write_docstring_parameters(self, routine)
+        Wrapper._build_docstring_parameters(self, context)
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@ import math
 import os
 import re
 import stat
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple
 
 from pystratum_backend.StratumIO import StratumIO
 
@@ -71,12 +71,12 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         The last modification time of the source file.
         """
 
-        self._routine_name: Optional[str] = None
+        self._routine_name: str | None = None
         """
         The name of the stored routine.
         """
 
-        self._routine_source_code: Optional[str] = None
+        self._routine_source_code: str | None = None
         """
         The source code as a single string of the stored routine.
         """
@@ -91,12 +91,12 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         The replace pairs (i.e. placeholders and their actual values).
         """
 
-        self._routine_type: Optional[str] = None
+        self._routine_type: str | None = None
         """
         The stored routine type (i.e. procedure or function) of the stored routine.
         """
 
-        self._designation_type: Optional[str] = None
+        self._designation_type: str | None = None
         """
         The designation type of the stored routine.
         """
@@ -111,12 +111,12 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         The DocBlock parts to be used by the wrapper generator.
         """
 
-        self._columns_types: Optional[List] = None
+        self._columns_types: List | None = None
         """
         The column types of columns of the table for bulk insert of the stored routine.
         """
 
-        self._fields: Optional[List] = None
+        self._fields: List | None = None
         """
         The keys in the dictionary for bulk insert.
         """
@@ -126,12 +126,12 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         The information about the parameters of the stored routine.
         """
 
-        self._table_name: Optional[str] = None
+        self._table_name: str | None = None
         """
         If designation type is bulk_insert the table name for bulk insert.
         """
 
-        self._columns: Optional[List] = None
+        self._columns: List | None = None
         """
         The key or index columns (depending on the designation type) of the stored routine.
         """
@@ -141,13 +141,13 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
         The output decorator.
         """
 
-        self.shadow_directory: Optional[str] = None
+        self.shadow_directory: str | None = None
         """
         The name of the directory were copies with pure SQL of the stored routine sources must be stored.
         """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def load_stored_routine(self) -> Union[Dict[str, str], bool]:
+    def load_stored_routine(self) -> Dict[str, str] | False:
         """
         Loads the stored routine into the instance of MySQL.
 
@@ -337,7 +337,7 @@ class RoutineLoaderHelper(metaclass=abc.ABCMeta):
 
         designation_type = list()
         for tag in reflection.get_tags('type'):
-                designation_type.append(tag)
+            designation_type.append(tag)
 
         if len(designation_type) == 1:
             pattern = re.compile(r'^@type\s*(\w+)\s*(.+)?\s*', re.IGNORECASE)

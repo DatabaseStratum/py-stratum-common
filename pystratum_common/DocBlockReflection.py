@@ -44,7 +44,7 @@ class DocBlockReflection:
         """
         Returns a tag.
 
-        @param str name: The name of the tag.
+        @param name: The name of the tag.
         """
         for tag in self._tags:
             if tag[0] == name:
@@ -57,7 +57,7 @@ class DocBlockReflection:
         """
         Returns a list of tags.
 
-        @param str name: The name of the tag.
+        @param name: The name of the tag.
         """
         tags = list()
         for tag in self._tags:
@@ -112,7 +112,6 @@ class DocBlockReflection:
         """
         Cleans the DocBlock from leading and trailing white space and comment tokens.
         """
-        # Return immediately if the DockBlock is empty.
         if not self._comment:
             return
 

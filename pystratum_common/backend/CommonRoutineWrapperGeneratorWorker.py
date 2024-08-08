@@ -2,10 +2,13 @@ import abc
 import configparser
 import json
 import os
-from typing import Any, Dict, Optional
+from typing import Dict
 
 from pystratum_backend.RoutineWrapperGeneratorWorker import RoutineWrapperGeneratorWorker
 from pystratum_backend.StratumIO import StratumIO
+
+from pystratum_common.BuildContext import BuildContext
+from pystratum_common.PythonCodeStore import PythonCodeStore
 from pystratum_common.Util import Util
 
 
@@ -21,37 +24,32 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
 
         :param io: The output decorator.
         """
-        self._code: str = ''
+        self._code_store: PythonCodeStore = PythonCodeStore()
         """
         The generated Python code buffer.
         """
 
-        self._lob_as_string_flag: bool = False
-        """
-        If true BLOBs and CLOBs must be treated as strings.
-        """
-
-        self._metadata_filename: Optional[str] = None
+        self._metadata_filename: str | None = None
         """
         The filename of the file with the metadata of all stored procedures.
         """
 
-        self._parent_class_name: Optional[str] = None
+        self._parent_class_name: str | None = None
         """
         The class name of the parent class of the routine wrapper.
         """
 
-        self._parent_class_namespace: Optional[str] = None
+        self._parent_class_namespace: str | None = None
         """
         The namespace of the parent class of the routine wrapper.
         """
 
-        self._wrapper_class_name: Optional[str] = None
+        self._wrapper_class_name: str | None = None
         """
         The class name of the routine wrapper.
         """
 
-        self._wrapper_filename: Optional[str] = None
+        self._wrapper_filename: str | None = None
         """
         The filename where the generated wrapper class must be stored.
         """
@@ -91,18 +89,19 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         """
         routines = self._read_routine_metadata()
 
-        self._write_class_header()
+        self._generate_class_header()
 
         if routines:
             for routine_name in sorted(routines):
                 if routines[routine_name]['designation'] != 'hidden':
-                    self._write_routine_function(routines[routine_name])
+                    context = BuildContext(self._code_store, routines[routine_name])
+                    self._build_routine_wrapper(context)
         else:
             self._io.error('No files with stored routines found')
 
-        self._write_class_trailer()
+        self._generate_class_trailer()
 
-        Util.write_two_phases(self._wrapper_filename, self._code, self._io)
+        Util.write_two_phases(self._wrapper_filename, self._code_store.get_code(), self._io)
 
     # ------------------------------------------------------------------------------------------------------------------
     def _read_configuration_file(self) -> None:
@@ -114,7 +113,6 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         self._wrapper_class_name = self._config.get('wrapper', 'wrapper_class')
         self._wrapper_filename = self._config.get('wrapper', 'wrapper_file')
         self._metadata_filename = self._config.get('wrapper', 'metadata')
-        self._lob_as_string_flag = bool(self._config.get('wrapper', 'lob_as_string'))
 
     # ------------------------------------------------------------------------------------------------------------------
     def _read_routine_metadata(self) -> Dict:
@@ -129,48 +127,34 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         return metadata
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _write_class_header(self) -> None:
+    def _generate_class_header(self) -> None:
         """
         Generate a class header for stored routine wrapper.
         """
-        self._write_line('from typing import Any, Dict, List, Optional, Union')
-        self._write_line()
-        self._write_line('from {0!s} import {1!s}'.format(self._parent_class_namespace, self._parent_class_name))
-        self._write_line()
-        self._write_line()
-        self._write_line('class {0!s}({1!s}):'.format(self._wrapper_class_name, self._parent_class_name))
-        self._write_line('    """')
-        self._write_line('    The stored routines wrappers.')
-        self._write_line('    """')
+        self._code_store.add_import(self._parent_class_namespace, self._parent_class_name)
+
+        self._code_store.append_line('class {0!s}({1!s}):'.format(self._wrapper_class_name, self._parent_class_name))
+        self._code_store.append_line('"""')
+        self._code_store.append_line('The stored routines wrappers.')
+        self._code_store.append_line('"""')
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _write_line(self, text: str = '') -> None:
-        """
-        Writes a line with Python code to the generate code buffer.
-
-        :param text: The line with Python code.
-        """
-        if text:
-            self._code += str(text) + "\n"
-        else:
-            self._code += "\n"
-
-    # ------------------------------------------------------------------------------------------------------------------
-    def _write_class_trailer(self) -> None:
+    def _generate_class_trailer(self) -> None:
         """
         Generate a class trailer for stored routine wrapper.
         """
-        self._write_line()
-        self._write_line()
-        self._write_line('# ' + ('-' * 118))
+        self._code_store.decrement_indent_level()
+        self._code_store.append_line()
+        self._code_store.append_separator()
+        self._code_store.append_line()
 
     # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
-    def _write_routine_function(self, routine: Dict[str, Any]) -> None:
+    def _build_routine_wrapper(self, context: BuildContext) -> None:
         """
-        Generates a complete wrapper method for a stored routine.
+        Builds a complete wrapper method for a stored routine.
 
-        :param routine: The metadata of the stored routine.
+        :param context: The build context.
         """
         raise NotImplementedError()
 

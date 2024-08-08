@@ -1,5 +1,6 @@
 from abc import ABC
 
+from pystratum_common.BuildContext import BuildContext
 from pystratum_common.wrapper.Wrapper import Wrapper
 
 
@@ -9,17 +10,15 @@ class Row1Wrapper(Wrapper, ABC):
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _return_type_hint(self) -> str:
+    def _return_type_hint(self, context: BuildContext) -> str:
         """
-        Returns the return type hint of the wrapper method.
-        """
-        return 'Any'
+        Returns the return type of the wrapper method.
 
-    # ------------------------------------------------------------------------------------------------------------------
-    def _get_docstring_return_type(self) -> str:
+        :param context: The build context.
         """
-        Returns the return type of the wrapper methods to be used in the docstring.
-        """
-        return 'dict[str,*]'
+        context.code_store.add_import('typing', 'Any')
+        context.code_store.add_import('typing', 'Dict')
+
+        return 'Dict[str, Any]'
 
 # ----------------------------------------------------------------------------------------------------------------------

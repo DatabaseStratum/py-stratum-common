@@ -2,7 +2,7 @@ import abc
 import configparser
 import json
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from pystratum_backend.RoutineLoaderWorker import RoutineLoaderWorker
 from pystratum_backend.StratumIO import StratumIO
@@ -33,7 +33,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         The meta data of all stored routines.
         """
 
-        self._pystratum_metadata_filename: Optional[str] = None
+        self._pystratum_metadata_filename: str | None = None
         """
         The filename of the file with the metadata of all stored routines.
         """
@@ -48,17 +48,17 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         A map from placeholders to their actual values.
         """
 
-        self._source_file_encoding: Optional[str] = None
+        self._source_file_encoding: str | None = None
         """
         The character set of the source files.
         """
 
-        self._source_directory: Optional[str] = None
+        self._source_directory: str | None = None
         """
         Path where source files can be found.
         """
 
-        self._source_file_extension: Optional[str] = None
+        self._source_file_extension: str | None = None
         """
         The extension of the source files.
         """
@@ -73,7 +73,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         The name of the class that acts like a namespace for constants.
         """
 
-        self.__shadow_directory: Optional[str] = None
+        self.__shadow_directory: str | None = None
         """
         The name of the directory were copies with pure SQL of the stored routine sources must be stored.
         """
@@ -89,13 +89,11 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def execute(self, file_names: Optional[List[str]] = None) -> int:
+    def execute(self, file_names: List[str] | None = None) -> int:
         """
         Loads stored routines into the current schema.
 
-        :param list[str] file_names: The sources that must be loaded. If empty all sources (if required) will loaded.
-
-        :rtype: int The status of exit.
+        :param file_names: The sources that must be loaded. If empty all sources (if required) will be loaded.
         """
         self._io.title('Loader')
 
@@ -145,6 +143,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
 
         :param name: The name of the replacement pair.
         :param value: The value of the replacement pair.
+        :param quote: Whether to quote the value.
         """
         key = '@' + name + '@'
         key = key.lower()
@@ -164,7 +163,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         self._replace_pairs[key] = value
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __load_list(self, file_names: Optional[List[str]]) -> None:
+    def __load_list(self, file_names: List[str] | None) -> None:
         """
         Loads all stored routines in a list into the RDBMS instance.
 
@@ -336,7 +335,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
             json.dump(self._pystratum_metadata, stream, indent=4, sort_keys=True)
 
     # ------------------------------------------------------------------------------------------------------------------
-    def find_source_files_from_list(self, file_names) -> None:
+    def find_source_files_from_list(self, file_names: List[str]) -> None:
         """
         Finds all source files that actually exists from a list of file names.
 

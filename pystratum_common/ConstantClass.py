@@ -1,7 +1,7 @@
 import importlib
 import inspect
 import re
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from pystratum_backend.StratumIO import StratumIO
 
@@ -95,7 +95,7 @@ class ConstantClass:
         return ret
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __extract_info(self, lines: List[str]) -> Dict[str, Union[str, int]]:
+    def __extract_info(self, lines: List[str]) -> Dict[str, int | str]:
         """
         Extracts the following info from the source of the module with the class that acts like a namespace for
         constants:

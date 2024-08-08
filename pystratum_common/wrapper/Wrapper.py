@@ -1,6 +1,7 @@
 import abc
 import os
-from typing import Any, Dict, Optional
+
+from pystratum_common.BuildContext import BuildContext
 
 
 class Wrapper(metaclass=abc.ABCMeta):
@@ -9,217 +10,97 @@ class Wrapper(metaclass=abc.ABCMeta):
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __init__(self, routine: Dict[str, Any], lob_as_string_flag: bool):
+    def _build_docstring_description(self, context: BuildContext) -> None:
         """
-        Object constructor.
+        Builds the description part of the docstring for the wrapper method of a stored routine.
 
-        :param routine: The metadata of the stored routine.
-        :param bool lob_as_string_flag: If 'True' LOBs must be treated as strings/bytes.
+        :param context: The build context.
         """
-        self._page_width: int = 120
-        """
-        The maximum number of columns in the source code.
-        """
-
-        self._code: str = ''
-        """
-        Buffer for the generated code.
-        """
-
-        self.__indent_level: int = 1
-        """
-        The current level of indentation in the generated code.
-        """
-
-        self._routine: Dict[str, Any] = routine
-        """
-        The metadata of the stored routine.
-        """
-
-        self._lob_as_string_flag: bool = lob_as_string_flag == 'True'
-        """
-        Whether BLOBs and CLOBs must be treated as strings.
-        """
+        if context.routine['pydoc']['description']:
+            context.code_store.append_line(context.routine['pydoc']['description'])
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _write(self, text: str) -> None:
+    def _build_docstring_parameters(self, context: BuildContext) -> None:
         """
-        Appends a part of code to the generated code.
+        Builds the parameters part of the docstring for the wrapper method of a stored routine.
 
-        :param str text: The part of code that must be appended.
+        :param context: The build context.
         """
-        self._code += str(text)
+        if context.routine['pydoc']['parameters']:
+            context.code_store.append_line('')
 
-    # ------------------------------------------------------------------------------------------------------------------
-    def _write_line(self, line: Optional[str] = None) -> None:
-        """
-        Appends a line of code to the generated code and adjust the indent level of the generated code.
-
-        :param line: The line of code (without LF) that must be appended.
-        """
-        if line is None:
-            self._write("\n")
-            if self.__indent_level > 1:
-                self.__indent_level -= 1
-        elif line == '':
-            self._write("\n")
-        else:
-            line = (' ' * 4 * self.__indent_level) + line
-            if line[-1:] == ':':
-                self.__indent_level += 1
-            self._write(line + "\n")
-
-    # ------------------------------------------------------------------------------------------------------------------
-    def _indent_level_down(self, levels: int = 1) -> None:
-        """
-        Decrements the indent level of the generated code.
-
-        :param levels: The number of levels indent level of the generated code must be decremented.
-        """
-        self.__indent_level -= int(levels)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    def _write_separator(self) -> None:
-        """
-        Inserts a horizontal (commented) line tot the generated code.
-        """
-        tmp = self._page_width - ((4 * self.__indent_level) + 2)
-        self._write_line('# ' + ('-' * tmp))
-
-    # ------------------------------------------------------------------------------------------------------------------
-    def is_lob_parameter(self, parameters: Dict[str, Any]) -> bool:
-        """
-        Returns Whether one of the parameters is a BLOB or CLOB.
-
-        :param parameters: The parameters of a stored routine.
-        """
-        raise NotImplementedError()
-
-    # ------------------------------------------------------------------------------------------------------------------
-    def write_routine_method(self, routine: Dict[str, Any]) -> str:
-        """
-        Returns a complete wrapper method.
-
-        :param routine: The routine metadata.
-        """
-        if self._lob_as_string_flag:
-            return self._write_routine_method_without_lob(routine)
-        else:
-            if self.is_lob_parameter(routine['parameters']):
-                return self._write_routine_method_with_lob(routine)
-            else:
-                return self._write_routine_method_without_lob(routine)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    def __write_docstring_description(self, routine: Dict[str, Any]) -> None:
-        """
-        Writes the description part of the docstring for the wrapper method of a stored routine.
-
-        :param routine: The metadata of the stored routine.
-        """
-        if routine['pydoc']['description']:
-            self._write_line(routine['pydoc']['description'])
-
-    # ------------------------------------------------------------------------------------------------------------------
-    def _write_docstring_parameters(self, routine: Dict[str, Any]) -> None:
-        """
-        Writes the parameters part of the docstring for the wrapper method of a stored routine.
-
-        :param routine: The metadata of the stored routine.
-        """
-        if routine['pydoc']['parameters']:
-            self._write_line('')
-
-            for param in routine['pydoc']['parameters']:
+            for param in context.routine['pydoc']['parameters']:
                 lines = param['description'].split(os.linesep)
-                self._write_line(':param {0} {1}: {2}'.format(param['python_type'],
-                                                              param['parameter_name'],
-                                                              lines[0]))
+                context.code_store.append_line(':param {0} {1}: {2}'.format(param['python_type'],
+                                                                            param['parameter_name'],
+                                                                            lines[0]))
                 del lines[0]
 
                 tmp = ':param {0} {1}:'.format(param['python_type'], param['parameter_name'])
                 indent = ' ' * len(tmp)
                 for line in lines:
-                    self._write_line('{0} {1}'.format(indent, line))
+                    context.code_store.append_line('{0} {1}'.format(indent, line))
 
-                self._write_line('{0} {1}'.format(indent, param['data_type_descriptor']))
+                context.code_store.append_line('{0} {1}'.format(indent, param['data_type_descriptor']))
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __write_docstring_return_type(self) -> None:
+    def _build_docstring_return_type(self, context: BuildContext) -> None:
         """
-        Writes the return type part of the docstring for the wrapper method of a stored routine.
+        Build the return type part of the docstring for the wrapper method of a stored routine.
+
+        :param context: The build context.
         """
-        rtype = self._get_docstring_return_type()
+        rtype = self._return_type_hint(context)
         if rtype:
-            self._write_line('')
-            self._write_line(':rtype: {0}'.format(rtype))
+            context.code_store.append_line('')
+            context.code_store.append_line(':rtype: {0}'.format(rtype))
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __write_docstring(self, routine: Dict[str, Any]) -> None:
+    def _build_docstring(self, context: BuildContext) -> None:
         """
-        Writes the docstring for the wrapper method of a stored routine.
+        Builds the docstring for the wrapper method of the stored routine.
 
-        :param routine: The metadata of the stored routine.
+        :param context: The build context.
         """
-        self._write_line('"""')
+        context.code_store.append_line('"""')
 
-        self.__write_docstring_description(routine)
-        self._write_docstring_parameters(routine)
-        self.__write_docstring_return_type()
+        self._build_docstring_description(context)
+        self._build_docstring_parameters(context)
+        self._build_docstring_return_type(context)
 
-        self._write_line('"""')
+        context.code_store.append_line('"""')
 
     # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
-    def _get_docstring_return_type(self) -> str:
+    def _return_type_hint(self, context: BuildContext) -> str:
         """
-        Returns the return type of the wrapper method to be used in the docstring.
+        Returns the return type of the wrapper method.
+
+        :param context: The build context.
         """
         raise NotImplementedError()
 
     # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
-    def _return_type_hint(self) -> str:
+    def _build_result_handler(self, context: BuildContext) -> None:
         """
-        Returns the return type hint of the wrapper method.
-        """
-        raise NotImplementedError()
+        Builds the code for calling the stored routine in the wrapper method.
 
-    # ------------------------------------------------------------------------------------------------------------------
-    @abc.abstractmethod
-    def _write_result_handler(self, routine: Dict[str, Any]) -> None:
-        """
-        Generates code for calling the stored routine in the wrapper method.
+        :param context: The build context.
         """
         raise NotImplementedError()
-
-    # ------------------------------------------------------------------------------------------------------------------
-    def _write_routine_method_with_lob(self, routine: Dict[str, Any]) -> str:
-        return self._write_routine_method_without_lob(routine)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    def _write_routine_method_without_lob(self, routine: Dict[str, Any]) -> str:
-        self._write_line()
-        self._write_separator()
-        self._write_line('def {0!s}({1!s}) -> {2!s}:'.format(str(routine['routine_name']),
-                                                             str(self._get_wrapper_args(routine)),
-                                                             str(self._return_type_hint())))
-        self.__write_docstring(routine)
-        self._write_result_handler(routine)
-
-        return self._code
 
     # ------------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def _get_wrapper_args(routine: Dict[str, Any]) -> str:
+    def _wrapper_args(context: BuildContext) -> str:
         """
         Returns code for the parameters of the wrapper method for the stored routine.
 
-        :param routine: The routine metadata.
+        :param context: The build context.
         """
         ret = 'self'
 
-        for parameter_info in routine['pydoc']['parameters']:
+        for parameter_info in context.routine['pydoc']['parameters']:
             if ret:
                 ret += ', '
 
@@ -229,5 +110,21 @@ class Wrapper(metaclass=abc.ABCMeta):
                 ret += ': ' + parameter_info['python_type_hint']
 
         return ret
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def build(self, context: BuildContext) -> None:
+        """
+        Builds the wrapper method.
+
+        :param context: The build context.
+        """
+        context.code_store.append_line()
+        context.code_store.append_separator()
+        context.code_store.append_line('def {0!s}({1!s}) -> {2!s}:'.format(str(context.routine['routine_name']),
+                                                                           str(self._wrapper_args(context)),
+                                                                           str(self._return_type_hint(context))))
+        self._build_docstring(context)
+        self._build_result_handler(context)
+        context.code_store.decrement_indent_level()
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 import abc
 import configparser
-from typing import Dict, Optional
+from typing import Dict
 
 from pystratum_backend.ConstantWorker import ConstantWorker
 from pystratum_backend.StratumIO import StratumIO
@@ -33,12 +33,12 @@ class CommonConstantWorker(ConstantWorker):
         starting this program).
         """
 
-        self._constants_filename: Optional[str] = None
+        self._constants_filename: str | None = None
         """
         Filename with column names, their widths, and constant names.
         """
 
-        self._prefix: Optional[str] = None
+        self._prefix: str | None = None
         """
         The prefix used for designations a unknown constants.
         """
@@ -85,7 +85,7 @@ class CommonConstantWorker(ConstantWorker):
     def execute(self) -> int:
         """
         Creates the constants class.
-        
+
         :rtype: int
         """
         self._read_configuration_file()
