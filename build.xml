@@ -82,12 +82,12 @@
 
     <!-- Creates a new distribution using pyproject.toml -->
     <target name="dist">
-        <exec command="./venv/bin/poetry build" passthru="true" checkreturn="true"/>
+        <exec command="./.venv/bin/poetry build" passthru="true" checkreturn="true"/>
     </target>
 
     <!-- Uploads a distribution to PyPI -->
     <target name="upload">
-        <exec command="./venv/bin/poetry publish" passthru="true" checkreturn="true"/>
+        <exec command="./.venv/bin/poetry publish" passthru="true" checkreturn="true"/>
     </target>
 
     <!-- All steps for releasing a new version -->
