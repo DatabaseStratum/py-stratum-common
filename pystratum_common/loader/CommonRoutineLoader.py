@@ -2,7 +2,6 @@ import abc
 import math
 import os
 import re
-import stat
 from typing import Dict, List, Tuple
 
 from pystratum_backend.StratumIO import StratumIO
@@ -141,11 +140,6 @@ class CommonRoutineLoader(metaclass=abc.ABCMeta):
         The output decorator.
         """
 
-        self.shadow_directory: str | None = None
-        """
-        The name of the directory were copies with pure SQL of the stored routine sources must be stored.
-        """
-
     # ------------------------------------------------------------------------------------------------------------------
     def load_stored_routine(self) -> Dict[str, str] | False:
         """
@@ -180,7 +174,6 @@ class CommonRoutineLoader(metaclass=abc.ABCMeta):
                     self._get_bulk_insert_table_columns_info()
                 self._get_routine_parameters_info()
                 self.__get_doc_block_parts_wrapper()
-                self.__save_shadow_copy()
                 self.__validate_parameter_lists()
                 self._update_metadata()
 
@@ -226,31 +219,6 @@ class CommonRoutineLoader(metaclass=abc.ABCMeta):
             self._routine_source_code = file.read()
 
         self._routine_source_code_lines = self._routine_source_code.split("\n")
-
-    # ------------------------------------------------------------------------------------------------------------------
-    def __save_shadow_copy(self) -> None:
-        """
-        Saves a copy of the stored routine source with pure SQL (if shadow directory is set).
-        """
-        if not self.shadow_directory:
-            return
-
-        destination_filename = os.path.join(self.shadow_directory, self._routine_name) + '.sql'
-
-        if os.path.realpath(destination_filename) == os.path.realpath(self._source_filename):
-            raise LoaderException("Shadow copy will override routine source '{}'".format(self._source_filename))
-
-        # Remove the (read only) shadow file if it exists.
-        if os.path.exists(destination_filename):
-            os.remove(destination_filename)
-
-        # Write the shadow file.
-        with open(destination_filename, 'wt', encoding=self._routine_file_encoding) as handle:
-            handle.write(self._routine_source_code)
-
-        # Make the file read only.
-        mode = os.stat(self._source_filename)[stat.ST_MODE]
-        os.chmod(destination_filename, mode & ~stat.S_IWUSR & ~stat.S_IWGRP & ~stat.S_IWOTH)
 
     # ------------------------------------------------------------------------------------------------------------------
     def __substitute_replace_pairs(self) -> None:
