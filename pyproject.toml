@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "PyStratum-Common"
-version = "3.0.0"
+version = "3.0.1"
 description = "PyStratum Common: Common parts shared between commons for database systems"
 authors = ["Set Based IT Consultancy <info@setbased.nl>"]
 license = "MIT"
