@@ -44,7 +44,7 @@ class TypeHintHelper:
         parts = {'whitespace': r'(?P<whitespace>\s+)',
                  'type_list':  r'(?P<datatype>(type-list).*)'.replace('type-list', all_columns_types),
                  'nullable':   r'(?P<nullable>not\s+null)?',
-                 'hint':       r'(?P<hint>\s+--\s+type:\s+([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+)'}
+                 'hint':       r'(?P<hint>\s+--\s+type:\s+.*)$'}
         pattern = ''.join(parts.values())
 
         for index, line in enumerate(code_lines):
@@ -90,7 +90,7 @@ class TypeHintHelper:
         """
         type_hints = {}
 
-        for match in re.finditer(r'(\s+--\s+type:\s+(?P<type_hint>(\w+\.)?\w+\.\w+)\s*\n)', code):
+        for match in re.finditer(r'(\s+--\s+type:\s+(?P<type_hint>(\w+\.)?\w+\.\w+(%max)?))', code):
             type_hint = match.group('type_hint')
             if type_hint not in self.__type_hints:
                 raise LoaderException("Unknown type hint '{0}' in file {1}".format(type_hint, path))
