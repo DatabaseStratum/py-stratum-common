@@ -31,7 +31,7 @@ class TypeHintHelper:
         self.__type_hints[hint] = data_type
 
     # ------------------------------------------------------------------------------------------------------------------
-    def update_types(self, code_lines: List[str], data_type_helper: CommonDataTypeHelper) -> str:
+    def update_types(self, code_lines: List[str], data_type_helper: CommonDataTypeHelper) -> List[str]:
         """
         Updates types in the source of the stored routine according to the type hints.
 
@@ -78,7 +78,38 @@ class TypeHintHelper:
             else:
                 new_code_lines.append(line)
 
-        return '\n'.join(new_code_lines)
+        return new_code_lines
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def align_type_hints(self, code_lines: List[str]) -> List[str]:
+        """
+        Aligns the type hints in the source of the stored routine.
+
+        :param code_lines: The source of the stored routine as an array of lines.
+        """
+        blocks = []
+        start = None
+        length = 0
+        for index, line in enumerate(code_lines):
+            match = re.search(r'--\s+type:\s+.*$', line)
+            if match:
+                if start is None:
+                    start = index
+                length = max(length, len(line) - len(match.group(0)) + 2)
+            else:
+                if start is not None:
+                    blocks.append({'first': start, 'last': index, 'length': length})
+                    start = None
+                    length = 0
+
+        for block in blocks:
+            for index in range(block['first'], block['last']):
+                matches = re.search(r'\s+type:\s+.*$', code_lines[index])
+                left_part = code_lines[index][0:-len(matches.group(0))].rstrip()
+                left_part = left_part + ' ' * (block['length'] - len(left_part) + 1)
+                code_lines[index] = left_part + matches.group(0).lstrip()
+
+        return code_lines
 
     # ------------------------------------------------------------------------------------------------------------------
     def get_type_hints(self, path: str, code: str) -> Dict[str, str]:

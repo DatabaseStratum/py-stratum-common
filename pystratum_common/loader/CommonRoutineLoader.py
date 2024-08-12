@@ -147,8 +147,9 @@ class CommonRoutineLoader(metaclass=abc.ABCMeta):
         :param context: The loader context.
         :param io: The output decorator.
         """
-        code = context.type_hints.update_types(context.stored_routine.code_lines, self._get_data_type_helper())
-        context.stored_routine.update_source(code, io)
+        lines = context.type_hints.update_types(context.stored_routine.code_lines, self._get_data_type_helper())
+        lines = context.type_hints.align_type_hints(lines)
+        context.stored_routine.update_source('\n'.join(lines), io)
 
     # ------------------------------------------------------------------------------------------------------------------
     def _validate_parameter_lists(self, context: LoaderContext) -> None:
