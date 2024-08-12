@@ -9,7 +9,7 @@ from pystratum_backend.StratumIO import StratumIO
 
 from pystratum_common.helper.Util import Util
 from pystratum_common.wrapper.helper.PythonCodeStore import PythonCodeStore
-from pystratum_common.wrapper.helper.WrapperContext import BuildContext
+from pystratum_common.wrapper.helper.WrapperContext import WrapperContext
 
 
 class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
@@ -74,7 +74,7 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         if self._wrapper_class_name:
             self._io.title('Wrapper')
 
-            self.__generate_wrapper_class()
+            self._generate_wrapper_class()
 
             self._io.write_line('')
         else:
@@ -83,18 +83,28 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         return 0
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __generate_wrapper_class(self) -> None:
+    @abc.abstractmethod
+    def _build_routine_wrapper(self, context: WrapperContext) -> None:
+        """
+        Builds a complete wrapper method for a stored routine.
+
+        :param context: The loader context.
+        """
+        raise NotImplementedError()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    def _generate_wrapper_class(self) -> None:
         """
         Generates the wrapper class.
         """
-        routines = self._read_routine_metadata()
+        routines = self._read_pystratum_metadata()
 
         self._generate_class_header()
 
         if routines:
             for routine_name in sorted(routines):
-                if routines[routine_name]['designation'] != 'hidden':
-                    context = BuildContext(self._code_store, routines[routine_name])
+                if routines[routine_name]['designation']['type'] != 'hidden':
+                    context = WrapperContext(self._code_store, routines[routine_name])
                     self._build_routine_wrapper(context)
         else:
             self._io.error('No files with stored routines found')
@@ -115,7 +125,7 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         self._metadata_filename = self._config.get('wrapper', 'metadata')
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _read_routine_metadata(self) -> Dict:
+    def _read_pystratum_metadata(self) -> Dict:
         """
         Returns the metadata of stored routines.
         """
@@ -123,6 +133,7 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         if os.path.isfile(self._metadata_filename):
             with open(self._metadata_filename, 'r') as file:
                 metadata = json.load(file)
+            metadata = metadata['stored_routines']
 
         return metadata
 
@@ -147,15 +158,5 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
         self._code_store.append_line()
         self._code_store.append_separator()
         self._code_store.append_line()
-
-    # ------------------------------------------------------------------------------------------------------------------
-    @abc.abstractmethod
-    def _build_routine_wrapper(self, context: BuildContext) -> None:
-        """
-        Builds a complete wrapper method for a stored routine.
-
-        :param context: The build context.
-        """
-        raise NotImplementedError()
 
 # ----------------------------------------------------------------------------------------------------------------------

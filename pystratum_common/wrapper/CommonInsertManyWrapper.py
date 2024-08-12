@@ -5,9 +5,9 @@ from pystratum_common.wrapper.CommonWrapper import CommonWrapper
 from pystratum_common.wrapper.helper.WrapperContext import WrapperContext
 
 
-class CommonBulkWrapper(CommonWrapper, ABC):
+class CommonInsertManyWrapper(CommonWrapper, ABC):
     """
-    Wrapper method generator for stored procedures with designation type bulk.
+    Wrapper method generator for stored procedures with designation type insert_many.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -27,21 +27,23 @@ class CommonBulkWrapper(CommonWrapper, ABC):
 
         :param context: The wrapper context.
         """
-        context.code_store.add_import('pystratum_middle.BulkHandler', 'BulkHandler')
+        context.code_store.add_import('typing', 'Any')
+        context.code_store.add_import('typing', 'Dict')
+        context.code_store.add_import('typing', 'List')
         parameters = CommonWrapper._wrapper_args(context)
 
-        return re.sub(r'^self', 'self, bulk_handler: BulkHandler', parameters)
+        return re.sub(r'^self', 'self, rows: List[Dict[str, Any]]', parameters)
 
     # ------------------------------------------------------------------------------------------------------------------
     def _build_docstring_parameters(self, context: WrapperContext) -> None:
         """
-        Builds the parameters part of the docstring for the wrapper method of a stored routine.
+        Builds the parameter's part of the docstring for the wrapper method of a stored routine.
 
         :param context: The wrapper context.
         """
-        parameter = {'name':                 'bulk_handler',
-                     'python_type':          'BulkHandler',
-                     'description':          'The bulk handler for processing the selected rows.',
+        parameter = {'name':                 'rows',
+                     'python_type':          'List[Dict[str, Any]]',
+                     'description':          'The rows that must be inserted.',
                      'data_type_descriptor': None}
         context.pystratum_metadata['pydoc']['parameters'].insert(0, parameter)
 

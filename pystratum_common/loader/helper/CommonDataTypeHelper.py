@@ -1,11 +1,19 @@
 import abc
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
-class DataTypeHelper(metaclass=abc.ABCMeta):
+class CommonDataTypeHelper(metaclass=abc.ABCMeta):
     """
     Utility class for deriving information based on a DBMS native data type.
     """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    @abc.abstractmethod
+    def all_column_types(self) -> List[str]:
+        """
+        Returns all column types supported by the RDBMS.
+        """
+        raise NotImplementedError()
 
     # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
@@ -14,16 +22,6 @@ class DataTypeHelper(metaclass=abc.ABCMeta):
         Returns the corresponding Python data type of DBMS native data type.
 
         :param dict data_type_info: The DBMS native data type metadata.
-        """
-        raise NotImplementedError()
-
-    # ------------------------------------------------------------------------------------------------------------------
-    @abc.abstractmethod
-    def column_type_to_python_type_hint(self, data_type_info: Dict[str, Any]) -> str:
-        """
-        Returns the corresponding Python data type hint of a MySQL data type.
-
-        :param dict data_type_info: The MySQL data type metadata.
         """
         raise NotImplementedError()
 

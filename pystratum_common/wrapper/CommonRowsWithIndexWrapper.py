@@ -1,21 +1,22 @@
 import abc
+from abc import ABC
 
 from pystratum_common.wrapper.CommonWrapper import CommonWrapper
-from pystratum_common.wrapper.helper.WrapperContext import BuildContext
+from pystratum_common.wrapper.helper.WrapperContext import WrapperContext
 
 
-class CommonRowsWithIndexWrapper(CommonWrapper):
+class CommonRowsWithIndexWrapper(CommonWrapper, ABC):
     """
     Parent class wrapper method generator for stored procedures whose result set  must be returned using tree
     structure using a combination of non-unique columns.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _return_type_hint(self, context: BuildContext) -> str:
+    def _return_type_hint(self, context: WrapperContext) -> str:
         """
         Returns the return type of the wrapper method.
 
-        :param context: The build context.
+        :param context: The wrapper context.
         """
         context.code_store.add_import('typing', 'Dict')
 
@@ -23,42 +24,43 @@ class CommonRowsWithIndexWrapper(CommonWrapper):
 
     # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
-    def _build_execute_rows(self, context: BuildContext) -> None:
+    def _build_execute_rows(self, context: WrapperContext) -> None:
         """
         Builds the code for invoking the stored routine.
 
-        :param context: The build context.
+        :param context: The wrapper context.
         """
         raise NotImplementedError()
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _build_result_handler(self, context: BuildContext) -> None:
+    def _build_result_handler(self, context: WrapperContext) -> None:
         """
         Builds the code for calling the stored routine in the wrapper method.
 
-        :param context: The build context.
+        :param context: The wrapper context.
         """
         context.code_store.append_line('ret = {}')
         self._build_execute_rows(context)
         context.code_store.append_line('for row in rows:')
 
-        num_of_dict = len(context.routine['columns'])
+        columns = context.pystratum_metadata['designation']['columns']
+        num_of_dict = len(columns)
 
         i = 0
         while i < num_of_dict:
-            value = "row['{0!s}']".format(context.routine['columns'][i])
+            value = "row['{0!s}']".format(columns[i])
 
             stack = ''
             j = 0
             while j < i:
-                stack += "[row['{0!s}']]".format(context.routine['columns'][j])
+                stack += "[row['{0!s}']]".format(columns[j])
                 j += 1
             line = 'if {0!s} in ret{1!s}:'.format(value, stack)
             context.code_store.append_line(line)
             i += 1
 
         line = 'ret'
-        for column_name in context.routine['columns']:
+        for column_name in columns:
             line += "[row['{0!s}']]".format(column_name)
         line += '.append(row)'
         context.code_store.append_line(line)
@@ -71,15 +73,15 @@ class CommonRowsWithIndexWrapper(CommonWrapper):
             part1 = ''
             j = 0
             while j < i - 1:
-                part1 += "[row['{0!s}']]".format(context.routine['columns'][j])
+                part1 += "[row['{0!s}']]".format(columns[j])
                 j += 1
-            part1 += "[row['{0!s}']]".format(context.routine['columns'][j])
+            part1 += "[row['{0!s}']]".format(columns[j])
 
             part2 = ''
             j = i - 1
             while j < num_of_dict:
                 if j + 1 != i:
-                    part2 += "{{row['{0!s}']: ".format(context.routine['columns'][j])
+                    part2 += "{{row['{0!s}']: ".format(columns[j])
                 j += 1
             part2 += "[row]" + ('}' * (num_of_dict - i))
 

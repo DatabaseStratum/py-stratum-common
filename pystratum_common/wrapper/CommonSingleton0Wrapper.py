@@ -1,7 +1,7 @@
 from abc import ABC
 
 from pystratum_common.wrapper.CommonWrapper import CommonWrapper
-from pystratum_common.wrapper.helper.WrapperContext import BuildContext
+from pystratum_common.wrapper.helper.WrapperContext import WrapperContext
 
 
 class CommonSingleton0Wrapper(CommonWrapper, ABC):
@@ -10,14 +10,19 @@ class CommonSingleton0Wrapper(CommonWrapper, ABC):
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _return_type_hint(self, context: BuildContext) -> str:
+    def _return_type_hint(self, context: WrapperContext) -> str:
         """
         Returns the return type of the wrapper method.
 
-        :param context: The build context.
+        :param context: The wrapper context.
         """
-        context.code_store.add_import('typing', 'Any')
+        return_types = context.pystratum_metadata['pydoc']['return']
+        if 'Any' in return_types:
+            context.code_store.add_import('typing', 'Any')
 
-        return 'Any'
+        if 'None' not in return_types:
+            return_types.append('None')
+
+        return ' | '.join(return_types)
 
 # ----------------------------------------------------------------------------------------------------------------------

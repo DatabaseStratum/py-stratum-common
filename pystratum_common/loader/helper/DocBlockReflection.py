@@ -25,7 +25,7 @@ class DocBlockReflection:
         The description.
         """
 
-        self._tags: List[Tuple[str, str]] = list()
+        self._tags: List[Tuple[str, str]] = []
         """
         The tags in the DocBlock
         """
@@ -40,24 +40,11 @@ class DocBlockReflection:
         return self._description
 
     # ------------------------------------------------------------------------------------------------------------------
-    def get_tag(self, name: str) -> str:
-        """
-        Returns a tag.
-
-        @param name: The name of the tag.
-        """
-        for tag in self._tags:
-            if tag[0] == name:
-                return tag[1]
-
-        return ''
-
-    # ------------------------------------------------------------------------------------------------------------------
     def get_tags(self, name: str) -> List[str]:
         """
         Returns a list of tags.
 
-        @param name: The name of the tag.
+        :param name: The name of the tag.
         """
         tags = list()
         for tag in self._tags:

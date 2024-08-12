@@ -29,7 +29,7 @@ class CommonConstantWorker(ConstantWorker):
 
         self._old_columns: Dict = {}
         """
-        The previous column names, widths, and constant names (i.e. the content of $myConstantsFilename upon
+        The previous column names, widths, and constant names (i.e. the content of self._constants_filename upon
         starting this program).
         """
 
@@ -58,16 +58,14 @@ class CommonConstantWorker(ConstantWorker):
         The output decorator.
         """
 
-        self._config = config
+        self._config: configparser.ConfigParser = config
         """
         The configuration object.
-
-        :type: ConfigParser 
         """
 
     # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
-    def connect(self) -> None:
+    def _connect(self) -> None:
         """
         Connects to the database.
         """
@@ -75,7 +73,7 @@ class CommonConstantWorker(ConstantWorker):
 
     # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
-    def disconnect(self) -> None:
+    def _disconnect(self) -> None:
         """
         Disconnects from the database.
         """
@@ -84,16 +82,16 @@ class CommonConstantWorker(ConstantWorker):
     # ------------------------------------------------------------------------------------------------------------------
     def execute(self) -> int:
         """
-        Creates the constants class.
+        Creates the constant's class.
 
-        :rtype: int
+        @rtype int:
         """
         self._read_configuration_file()
 
         if self._constants_filename:
             self._io.title('Constants')
 
-            self.connect()
+            self._connect()
             self._get_old_columns()
             self._get_columns()
             self._enhance_columns()
@@ -101,9 +99,9 @@ class CommonConstantWorker(ConstantWorker):
             self._write_columns()
             self._get_labels()
             self._fill_constants()
-            self.__write_constant_class()
-            self.disconnect()
-            self.__log_number_of_constants()
+            self._write_constant_class()
+            self._disconnect()
+            self._log_number_of_constants()
 
             self._io.write_line('')
         else:
@@ -112,7 +110,7 @@ class CommonConstantWorker(ConstantWorker):
         return 0
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __log_number_of_constants(self) -> None:
+    def _log_number_of_constants(self) -> None:
         """
         Logs the number of constants generated.
         """
@@ -194,7 +192,7 @@ class CommonConstantWorker(ConstantWorker):
         raise NotImplementedError()
 
     # ------------------------------------------------------------------------------------------------------------------
-    def __write_constant_class(self) -> None:
+    def _write_constant_class(self) -> None:
         """
         Inserts new and replaces old (if any) constant declaration statements in the class that acts like a namespace
         for constants.

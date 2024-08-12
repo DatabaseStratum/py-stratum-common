@@ -5,7 +5,7 @@ from pystratum_common.wrapper.helper.PythonCodeStore import PythonCodeStore
 
 
 @dataclass
-class BuildContext:
+class WrapperContext:
     """
     The build context for generating wrapper methods for invoking stored routines.
     """
@@ -15,7 +15,7 @@ class BuildContext:
     The Python code store for, well, storing the generated Python code.
     """
 
-    routine: Dict[str, Any]
+    pystratum_metadata: Dict[str, Any]
     """
     The metadata of the stored routine.
     """

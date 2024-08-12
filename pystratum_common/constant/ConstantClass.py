@@ -1,5 +1,6 @@
 import importlib
 import inspect
+import os
 import re
 from typing import Any, Dict, List
 
@@ -63,7 +64,13 @@ class ConstantClass:
         """
         Returns the filename of the module with the class that acts like a namespace for constants.
         """
-        return inspect.getfile(self.__module)
+        path = os.path.realpath(inspect.getfile(self.__module))
+        cwd = os.path.realpath(os.getcwd())
+        common = os.path.commonprefix([path, cwd])
+        if common == cwd:
+            return os.path.relpath(path, cwd)
+
+        return path
 
     # ------------------------------------------------------------------------------------------------------------------
     def source(self) -> str:
