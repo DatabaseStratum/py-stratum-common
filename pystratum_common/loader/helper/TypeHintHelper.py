@@ -21,14 +21,14 @@ class TypeHintHelper:
         """
 
     # ------------------------------------------------------------------------------------------------------------------
-    def add_type_hint(self, hint: str, data_type: str) -> None:
+    def add_type_hint(self, type_hint: str, data_type: str) -> None:
         """
         Adds a type hint with its actual data type.
 
-        :param hint: The name of the placeholder.
-        :param data_type: The actual value of the placeholder.
+        :param type_hint: The type hint.
+        :param data_type: The actual data type of the type hint.
         """
-        self.__type_hints[hint] = data_type
+        self.__type_hints[type_hint] = data_type
 
     # ------------------------------------------------------------------------------------------------------------------
     def update_types(self, code_lines: List[str], data_type_helper: CommonDataTypeHelper) -> List[str]:
@@ -112,9 +112,9 @@ class TypeHintHelper:
         return code_lines
 
     # ------------------------------------------------------------------------------------------------------------------
-    def get_type_hints(self, path: str, code: str) -> Dict[str, str]:
+    def extract_type_hints(self, path: str, code: str) -> Dict[str, str]:
         """
-        Returns the type hints found in the source of the stored routine.
+        Returns the type hints in the source of a stored routine.
 
         :param path: The path to the source of the stored routine.
         :param code: The source of the stored routine.
@@ -136,8 +136,8 @@ class TypeHintHelper:
 
         :param type_hints: The set of type hints.
         """
-        for hint, data_type in type_hints.items():
-            if hint not in self.__type_hints or data_type != self.__type_hints[hint]:
+        for type_hint, data_type in type_hints.items():
+            if type_hint not in self.__type_hints or data_type != self.__type_hints[type_hint]:
                 return False
 
         return True

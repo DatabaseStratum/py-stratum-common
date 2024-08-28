@@ -11,7 +11,7 @@ from pystratum_common.loader.helper.LoaderContext import LoaderContext
 
 class CommonRoutineLoader(metaclass=abc.ABCMeta):
     """
-    Class for loading a single stored routine into a RDBMS instance from a SQL file.
+    Class for loading a single stored routine into a RDBMS instance from an SQL file.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -80,6 +80,8 @@ class CommonRoutineLoader(metaclass=abc.ABCMeta):
 
         if not context.old_rdbms_metadata:
             return True
+
+        return False
 
     # ------------------------------------------------------------------------------------------------------------------
     @abc.abstractmethod
@@ -244,8 +246,8 @@ class CommonRoutineLoader(metaclass=abc.ABCMeta):
 
         :param context: The loader context.
         """
-        placeholders = context.placeholders.get_placeholders(context.stored_routine.path, context.stored_routine.code)
-        type_hints = context.type_hints.get_type_hints(context.stored_routine.path, context.stored_routine.code)
+        placeholders = context.placeholders.extract_placeholders(context.stored_routine.path, context.stored_routine.code)
+        type_hints = context.type_hints.extract_type_hints(context.stored_routine.path, context.stored_routine.code)
 
         context.new_pystratum_metadata['routine_name'] = context.stored_routine.name
         context.new_pystratum_metadata['designation'] = context.doc_block.designation

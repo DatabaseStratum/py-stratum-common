@@ -47,9 +47,9 @@ class PlaceholderHelper:
         return '\n'.join(new_code_lines)
 
     # ------------------------------------------------------------------------------------------------------------------
-    def get_placeholders(self, path: str, code: str) -> Dict[str, str]:
+    def extract_placeholders(self, path: str, code: str) -> Dict[str, str]:
         """
-        Returns the placeholders found in the source of the stored routine.
+        Returns the placeholders in the source of a stored routine.
 
         :param path: The path to the source of the stored routine.
         :param code: The source of the stored routine.
@@ -70,8 +70,8 @@ class PlaceholderHelper:
 
         :param placeholders: The set of placeholders.
         """
-        for key, value in placeholders.items():
-            if key not in self.__placeholders or value != self.__placeholders[key]:
+        for placeholder, value in placeholders.items():
+            if placeholder not in self.__placeholders or value != self.__placeholders[placeholder]:
                 return False
 
         return True
