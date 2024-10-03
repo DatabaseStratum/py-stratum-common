@@ -95,7 +95,7 @@ class CommonRoutineLoader(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _extract_name(self, context: LoaderContext) -> None:
         """
-        Extracts the name of the stored routine and the stored routine type (i.e. procedure or function) source.
+        Extracts the name of the stored routine and the stored routine type (i.e., procedure or function) source.
 
         :param context: The loader context.
         """
@@ -157,7 +157,7 @@ class CommonRoutineLoader(metaclass=abc.ABCMeta):
     def _validate_parameter_lists(self, context: LoaderContext) -> None:
         """
         Validates the parameters found the DocBlock in the source of the stored routine against the parameters from the
-        metadata of MySQL and reports missing and unknown parameters names.
+        metadata of RDBMS and reports missing and unknown parameters names.
 
         :param context: The loader context.
         """
@@ -260,7 +260,7 @@ class CommonRoutineLoader(metaclass=abc.ABCMeta):
     # ------------------------------------------------------------------------------------------------------------------
     def _set_magic_constants(self, context: LoaderContext) -> None:
         """
-        Adds magic constants to placeholders.
+        Adds magic constants to the placeholders.
 
         :param context: The loader context.
         """

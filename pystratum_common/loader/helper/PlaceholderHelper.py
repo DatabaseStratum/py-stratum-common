@@ -58,7 +58,7 @@ class PlaceholderHelper:
         for match in re.finditer(r'(@[A-Za-z0-9_.]+(%(max-)?type)?@)', code):
             place_holder = match[0]
             if place_holder not in self.__placeholders:
-                raise LoaderException("Unknown placeholder '{0}' in file {1}".format(place_holder, path))
+                raise LoaderException("Unknown placeholder '{0}' in file {1}.".format(place_holder, path))
             placeholders[place_holder] = self.__placeholders[place_holder]
 
         return placeholders

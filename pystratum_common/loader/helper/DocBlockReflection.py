@@ -118,7 +118,7 @@ class DocBlockReflection:
     # ------------------------------------------------------------------------------------------------------------------
     def __extract_description(self) -> None:
         """
-        Extracts the description from the DocBlock. The description start at the first line and stops at the first tag
+        Extracts the description from the DocBlock. The description starts at the first line and stops at the first tag
         or the end of the DocBlock.
         """
         tmp = list()

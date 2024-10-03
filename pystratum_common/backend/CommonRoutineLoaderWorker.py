@@ -30,7 +30,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         """
         self.__error_file_names = set()
         """
-        A set with source names that are not loaded into RDBMS instance.
+        A set with source names that are not loaded into the RDBMS instance.
         """
 
         self.__pystratum_metadata: Dict = {}
@@ -191,7 +191,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
             self._io.listing(sorted(self.__error_file_names))
 
     # ------------------------------------------------------------------------------------------------------------------
-    def _add_placeholder(self, name: str, value: str, quote: bool):
+    def _add_placeholder(self, name: str, value: Any, quote: bool):
         """
         Adds a replacement to the map of replacement pairs.
 
@@ -210,7 +210,7 @@ class CommonRoutineLoaderWorker(RoutineLoaderWorker):
         elif class_name in ['str']:
             self.__placeholders.add_placeholder(key, "'" + value + "'" if quote else value)
         else:
-            self._io.log_verbose("Ignoring constant {} which is an instance of {}".format(name, class_name))
+            self._io.log_verbose("Ignoring constant {} which is an instance of {}.".format(name, class_name))
 
     # ------------------------------------------------------------------------------------------------------------------
     def _add_type_hint(self, hint: str, data_type: str):

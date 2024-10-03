@@ -187,7 +187,7 @@ class CommonConstantWorker(ConstantWorker):
     @abc.abstractmethod
     def _fill_constants(self) -> None:
         """
-        Merges columns and labels (i.e. all known constants) into constants.
+        Merges columns and labels (i.e., all known constants) into constants.
         """
         raise NotImplementedError()
 

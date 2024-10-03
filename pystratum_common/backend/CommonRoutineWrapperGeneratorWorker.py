@@ -86,9 +86,9 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
     @abc.abstractmethod
     def _build_routine_wrapper(self, context: WrapperContext) -> None:
         """
-        Builds a complete wrapper method for a stored routine.
+        Builds a complete wrapper method for invoking a stored routine.
 
-        :param context: The loader context.
+        :param context: The wrapper context.
         """
         raise NotImplementedError()
 
@@ -140,7 +140,7 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
     # ------------------------------------------------------------------------------------------------------------------
     def _generate_class_header(self) -> None:
         """
-        Generate a class header for stored routine wrapper.
+        Generates a class header for the stored routine wrappers.
         """
         self._code_store.add_import(self._parent_class_namespace, self._parent_class_name)
 
@@ -152,7 +152,7 @@ class CommonRoutineWrapperGeneratorWorker(RoutineWrapperGeneratorWorker):
     # ------------------------------------------------------------------------------------------------------------------
     def _generate_class_trailer(self) -> None:
         """
-        Generate a class trailer for stored routine wrapper.
+        Generates a class trailer for the stored routine wrappers.
         """
         self._code_store.decrement_indent_level()
         self._code_store.append_line()
