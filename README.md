@@ -8,7 +8,7 @@ Common parts shared between backends for database systems.
             <th>Social</th>
             <th>Legal</th>
             <th>Release</th>
-            <th>Test</th>
+            <th>Tests</th>
         </tr>
     </thead>
     <tbody>
