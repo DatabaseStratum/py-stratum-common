@@ -6,8 +6,9 @@ Common parts shared between backends for database systems.
     <thead>
         <tr>
             <th>Social</th>
+            <th>Legal</th>
             <th>Release</th>
-            <th>Code</th>
+            <th>Test</th>
         </tr>
     </thead>
     <tbody>
@@ -18,14 +19,16 @@ Common parts shared between backends for database systems.
                 </a>
             </td>
             <td>
+                <a href="https://github.com/DatabaseStratum/py-stratum-common/blob/master/LICENSE.md"><img alt="GitHub License" src="https://img.shields.io/github/license/DatabaseStratum/py-stratum-common%20"></a>
+            </td>
+            <td>
                 <a href="https://badge.fury.io/py/PyStratum-Common">
                     <img src="https://badge.fury.io/py/PyStratum-Common.svg" alt="Latest Stable Version"/>
                 </a>
             </td>
             <td>
-                <a href="https://scrutinizer-ci.com/g/DatabaseStratum/py-stratum-common/?branch=master">
-                    <img src="https://scrutinizer-ci.com/g/DatabaseStratum/py-stratum-common/badges/quality-score.png?b=master" alt="Scrutinizer Code Quality"/>
-                </a>
+                <a href="https://github.com/DatabaseStratum/py-stratum-common/actions/workflows/unit.yml"><img src="https://github.com/DatabaseStratum/py-stratum-common/actions/workflows/unit.yml/badge.svg" alt="Build Status"/></a><br/>
+                <a href="https://codecov.io/gh/DatabaseStratum/py-stratum-common"><img src="https://codecov.io/gh/DatabaseStratum/py-stratum-common/graph/badge.svg"/></a>
             </td>
         </tr>
     </tbody>
