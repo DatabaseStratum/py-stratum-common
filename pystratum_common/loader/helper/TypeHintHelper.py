@@ -1,3 +1,4 @@
+import copy
 import re
 from typing import Dict, List
 
@@ -38,47 +39,48 @@ class TypeHintHelper:
         :param code_lines: The source of the stored routine as an array of lines.
         :param data_type_helper: The data type helper.
         """
-        new_code_lines = []
-
         all_columns_types = '|'.join(data_type_helper.all_column_types())
         parts = {'whitespace': r'(?P<whitespace>\s+)',
-                 'type_list':  r'(?P<datatype>(type-list).*)'.replace('type-list', all_columns_types),
-                 'nullable':   r'(?P<nullable>not\s+null)?',
-                 'hint':       r'(?P<hint>\s+--\s+type:\s+.*)$'}
+                 'type_list':  r'(?P<datatype>(type-list)(?P<extra>.*)?)'.replace('type-list', all_columns_types),
+                 'hint':       r'(?P<hint>\s+--\s+type:\s+(\w+\.)?\w+\.\w+(%max)?\s*)$'}
         pattern = ''.join(parts.values())
 
+        code_lines = copy.copy(code_lines)
         for index, line in enumerate(code_lines):
             if re.search(parts['hint'], line):
-                matches = re.search(pattern, line)
+                matches = re.search(pattern, line, re.IGNORECASE)
                 if not matches:
                     raise LoaderException(f'Found a type hint at line {index + 1}, but unable to find data type.')
 
-                hint = re.sub(r'\s+--\s+type:\s+', '', matches['hint'])
+                hint = re.sub(r'\s+--\s+type:\s+', '', matches['hint'], re.IGNORECASE)
                 if hint not in self.__type_hints:
                     raise LoaderException(f"Unknown type hint '{hint}' found at line {index + 1}.")
 
-                other = re.search(r'(?P<punctuation>\s*[;,]\s*)$', matches['datatype'])
+                other = re.search(r'(?P<extra1> not\s+null)?\s*(?P<extra2> default.+)?\s*(?P<extra3>[;,]\s*)?$',
+                                  matches['datatype'],
+                                  re.IGNORECASE)
                 if other:
-                    punctuation = other['punctuation']
+                    extra1 = other.group('extra1') or ''
+                    extra2 = other.group('extra2') or ''
+                    extra3 = other.group('extra3') or ''
                 else:
-                    punctuation = ''
+                    extra1 = ''
+                    extra2 = ''
+                    extra3 = ''
 
                 actual_type = self.__type_hints[hint]
-                new_line = '{}{}{}{}{}{}'.format(line[0:-len(matches[0])],
-                                                 matches['whitespace'],
-                                                 actual_type,  # <== the real update
-                                                 matches['nullable'] if matches['nullable'] else '',
-                                                 punctuation,
-                                                 matches['hint'])
+                new_line = '{}{}{}{}{}{}{}'.format(line[0:-len(matches[0])],
+                                                   matches['whitespace'],
+                                                   actual_type,  # <== the real replacement
+                                                   extra1,
+                                                   extra2,
+                                                   extra3,
+                                                   matches['hint'])
 
                 if line.replace(' ', '') != new_line.replace(' ', ''):
-                    new_code_lines.append(new_line)
-                else:
-                    new_code_lines.append(line)
-            else:
-                new_code_lines.append(line)
+                    code_lines[index] = new_line
 
-        return new_code_lines
+        return code_lines
 
     # ------------------------------------------------------------------------------------------------------------------
     def align_type_hints(self, code_lines: List[str]) -> List[str]:
